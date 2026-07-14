@@ -3,12 +3,13 @@ const { batchUpdate } = require('./lib');
 const fs = require('fs');
 const { id, sheetMap } = JSON.parse(fs.readFileSync(__dirname + '/spreadsheet.json'));
 
-const REF = sheetMap['📋 Reference Data'];
-const DSH = sheetMap['📊 Dashboard'];
-const GRT = sheetMap['🎁 Gift Recipient Tracker'];
-const WSH = sheetMap['💡 Gift Idea Wishlist'];
-const CDL = sheetMap['💌 Holiday Card & Mailing List'];
-const RET = sheetMap['🔄 Return & Exchange Tracker'];
+const REF  = sheetMap['📋 Reference Data'];
+const DSH  = sheetMap['📊 Dashboard'];
+const GRT  = sheetMap['🎁 Gift Recipient Tracker'];
+const WSH  = sheetMap['💡 Gift Idea Wishlist'];
+const CDL  = sheetMap['💌 Holiday Card & Mailing List'];
+const RET  = sheetMap['🔄 Return & Exchange Tracker'];
+const DSH2 = sheetMap['🌙 Dashboard — Dark Theme'];
 
 function freeze(sheetId, rows, cols) {
   return {
@@ -32,15 +33,17 @@ function hideSheet(sheetId) {
   const reqs = [
     // Dashboard: freeze rows 1-3 (title + subtitle + inputs)
     freeze(DSH, 3, 0),
-    // Gift Recipient Tracker: freeze row 1 (headers) + col A (recipient name)
+    // Dark Dashboard: same freeze
+    freeze(DSH2, 3, 0),
+    // Gift Recipient Tracker: freeze row 1 (headers) + col A (recipient)
     freeze(GRT, 1, 1),
-    // Gift Idea Wishlist: freeze row 1 (headers) + col A (recipient)
+    // Gift Idea Wishlist: freeze row 1 + col A
     freeze(WSH, 1, 1),
-    // Holiday Card: freeze row 1 (headers) + col A (name)
+    // Holiday Card: freeze row 1 + col A
     freeze(CDL, 1, 1),
-    // Return Tracker: freeze row 1 (headers) + col A (recipient)
+    // Return Tracker: freeze row 1 + col A
     freeze(RET, 1, 1),
-    // Reference Data: freeze header row then hide
+    // Reference Data: freeze header only, then hide
     freeze(REF, 1, 0),
     hideSheet(REF),
   ];

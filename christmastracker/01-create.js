@@ -18,6 +18,7 @@ const TABS = [
   { title: '💡 Gift Idea Wishlist',          color: '#2D5016' },
   { title: '💌 Holiday Card & Mailing List', color: '#B23A3A' },
   { title: '🔄 Return & Exchange Tracker',   color: '#7A9B7A' },
+  { title: '🌙 Dashboard — Dark Theme',      color: '#1F2B22' },
 ];
 
 (async () => {

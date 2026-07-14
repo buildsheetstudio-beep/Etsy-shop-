@@ -4,43 +4,29 @@ const fs = require('fs');
 const { id, sheetMap } = JSON.parse(fs.readFileSync(__dirname + '/spreadsheet.json'));
 const REF = sheetMap['📋 Reference Data'];
 
-// 7 columns:
-//   A: Relationship  B: Delivery Method  C: Priority  D: Card Status
-//   E: Return Status  F: Store Name  G: Return Window (days)
+// Columns:
+//   A: Relationship/Group (5 items)
+//   B: Delivery Method (3 items)
+//   C: Gift Idea Priority (3 items)
+//   D: Holiday Card Status (3 items)
+//   E: Return/Exchange Status (4 items)
+//   F: Store Name  G: Return Window (days)  (6 stores)
 
-const relationships = ['Spouse/Partner','Parent','Child','Sibling','Grandparent','Friend','Coworker','Neighbor','Other'];
-const delivery      = ['Ship to Home','In Person','Store Pickup','Digital/Download','Mail'];
-const priority      = ['High','Medium','Low'];
-const cardStatus    = ['Not Sent','Sent','Received'];
-const returnStatus  = ['Pending','Initiated','In Progress','Completed','Denied'];
-const stores        = ['Amazon','Target','Walmart','Best Buy','Etsy','Macy\'s','Nordstrom','HomeGoods','Other'];
-const windows       = [30, 30, 90, 15, 30, 60, 60, 30, 30];
+const data = [
+  ['Relationship/Group', 'Delivery Method', 'Priority',  'Card Status',    'Return Status',   'Store Name', 'Return Window (days)'],
+  ['Family',             'In Person',        'High',      'Not Sent',       'N/A',             'Amazon',      30],
+  ['Extended Family',    'Mail',             'Medium',    'Sent',           'Pending Return',  'Target',      90],
+  ['Friends',            'Pickup',           'Low',       'Received',       'Returned',        'Best Buy',    15],
+  ['Coworkers',          '',                 '',          '',               'Exchanged',       'Walmart',     90],
+  ['Other',              '',                 '',          '',               '',                'Etsy',        14],
+  ['',                   '',                 '',          '',               '',                'Other',       30],
+];
 
 (async () => {
-  // ── Values ────────────────────────────────────────────────────────────────
-  const maxRows = Math.max(relationships.length, delivery.length, priority.length,
-    cardStatus.length, returnStatus.length, stores.length);
-
-  const rows = [];
-  // Header
-  rows.push(['Relationship','Delivery Method','Priority','Card Status','Return Status','Store Name','Return Window (days)']);
-  for (let i = 0; i < maxRows; i++) {
-    rows.push([
-      relationships[i] || '',
-      delivery[i]      || '',
-      priority[i]      || '',
-      cardStatus[i]    || '',
-      returnStatus[i]  || '',
-      stores[i]        || '',
-      windows[i]       || '',
-    ]);
-  }
-
   await valuesBatchUpdate(id, [
-    { range: "'📋 Reference Data'!A1", values: rows },
+    { range: "'📋 Reference Data'!A1", values: data },
   ], 'ref-values');
 
-  // ── Formatting ────────────────────────────────────────────────────────────
   const reqs = [];
 
   // Header row
@@ -52,14 +38,15 @@ const windows       = [30, 30, 90, 15, 30, 60, 60, 30, 30];
           backgroundColor: hex(C.deepCranberry),
           textFormat: { foregroundColor: hex(C.white), bold: true, fontSize: 10 },
           horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
+          wrapStrategy: 'WRAP',
         },
       },
-      fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)',
+      fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment,wrapStrategy)',
     },
   });
 
-  // Data rows alternating
-  for (let r = 1; r <= maxRows; r++) {
+  // Data rows
+  for (let r = 1; r < data.length; r++) {
     reqs.push({
       repeatCell: {
         range: gridRange(REF, r, r + 1, 0, 7),
@@ -75,8 +62,16 @@ const windows       = [30, 30, 90, 15, 30, 60, 60, 30, 30];
     });
   }
 
-  // Column widths
-  [130, 130, 80, 100, 110, 110, 160].forEach((w, ci) => {
+  // Return window column G — number format
+  reqs.push({
+    repeatCell: {
+      range: gridRange(REF, 1, 7, 6, 7),
+      cell: { userEnteredFormat: { numberFormat: { type: 'NUMBER', pattern: '0' }, horizontalAlignment: 'CENTER' } },
+      fields: 'userEnteredFormat(numberFormat,horizontalAlignment)',
+    },
+  });
+
+  [130, 120, 80, 100, 120, 110, 160].forEach((w, ci) => {
     reqs.push({ updateDimensionProperties: { range: { sheetId: REF, dimension: 'COLUMNS', startIndex: ci, endIndex: ci + 1 }, properties: { pixelSize: w }, fields: 'pixelSize' } });
   });
 
