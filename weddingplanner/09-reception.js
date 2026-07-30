@@ -122,7 +122,7 @@ const segments = [
     } else {
       data.push({ range: `${S}!N${row}`, values: [[
         `=IFERROR(IF(AND(B${row}<>"",C${row-1}<>"",TIMEVALUE(B${row})<TIMEVALUE(C${row-1})),"YES",""),"")`,
-      ]]) });
+      ]] });
     }
     data.push({ range: `${S}!O${row}`, values: [[notes]] });
     data.push({ range: `${S}!P${row}`, values: [[false]] });
