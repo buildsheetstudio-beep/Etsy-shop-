@@ -34,6 +34,32 @@ const BS = "'Buyer Setup'";
   const data = [];
   const compStart = 30;
 
+  // ── Fix A: Lease input cells — add INDEX/MATCH so they update when C6 changes ──
+  // C7: MSRP — Listing Price from VQ column M
+  data.push({ range: `${S}!C7`, values: [[
+    `=IFERROR(INDEX(${VQ}!$M$6:$M$105,MATCH(C6,${VQ}!$A$6:$A$105,0)),36500)`
+  ]]});
+  // C8: Negotiated Cap Cost — Negotiated Price from VQ column N
+  data.push({ range: `${S}!C8`, values: [[
+    `=IFERROR(INDEX(${VQ}!$N$6:$N$105,MATCH(C6,${VQ}!$A$6:$A$105,0)),34800)`
+  ]]});
+  // C15: Documentation Fee — from VQ column P
+  data.push({ range: `${S}!C15`, values: [[
+    `=IFERROR(INDEX(${VQ}!$P$6:$P$105,MATCH(C6,${VQ}!$A$6:$A$105,0)),495)`
+  ]]});
+  // C16: Registration — from VQ column Q
+  data.push({ range: `${S}!C16`, values: [[
+    `=IFERROR(INDEX(${VQ}!$Q$6:$Q$105,MATCH(C6,${VQ}!$A$6:$A$105,0)),285)`
+  ]]});
+  // C23: Insurance (monthly) — from VQ column AA
+  data.push({ range: `${S}!C23`, values: [[
+    `=IFERROR(INDEX(${VQ}!$AA$6:$AA$105,MATCH(C6,${VQ}!$A$6:$A$105,0)),150)`
+  ]]});
+  // C24: Maintenance (monthly) — from VQ column AB
+  data.push({ range: `${S}!C24`, values: [[
+    `=IFERROR(INDEX(${VQ}!$AB$6:$AB$105,MATCH(C6,${VQ}!$A$6:$A$105,0)),55)`
+  ]]});
+
   // ── Fix 1: C18 — Monthly Lease Payment (was circular self-reference) ────────
   // Standard lease formula: ((AdjCapCost - Residual) / Term + (AdjCapCost + Residual) × MoneyFactor) × (1+TaxRate)
   // C8=Cap Cost, C9=CapReduction, C7=MSRP, C12=Residual%, C10=Term, C11=MoneyFactor, C17=TaxRate
