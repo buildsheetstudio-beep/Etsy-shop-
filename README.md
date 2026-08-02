@@ -6,10 +6,10 @@ and awareness only — no automated trading. Full design: [`DESIGN.md`](./DESIGN
 
 ## Status
 
-Scaffolding in progress. The **Data Agent** (section 6.2) and **Discovery
-Agent** (section 6.1) are implemented and tested. News, Trend, and
-Synthesis agents are stubbed (`NotImplementedError`) pending the open
-items in DESIGN.md section 10.
+Scaffolding in progress. The **Data Agent** (section 6.2), **Discovery
+Agent** (section 6.1), and **News/Catalyst Agent** (section 6.3) are
+implemented and tested. Trend and Synthesis agents are stubbed
+(`NotImplementedError`) pending the open items in DESIGN.md section 10.
 
 The Discovery Agent depends on a `WebSearchProvider` interface
 (`clients/websearch_client.py`) rather than a hardcoded vendor, since
@@ -37,14 +37,14 @@ src/stock_agent/
   agents/
     data_agent.py             Implemented — DESIGN.md 6.2
     discovery_agent.py        Implemented — DESIGN.md 6.1
-    news_agent.py              Stub — DESIGN.md 6.3
+    news_agent.py              Implemented — DESIGN.md 6.3
     trend_agent.py              Stub — DESIGN.md 6.4
     synthesis_agent.py          Stub — DESIGN.md 6.5
-  pipeline.py                 Wires agent stages together (Data + Discovery stages, so far)
+  pipeline.py                 Wires agent stages together (Data + Discovery + News stages, so far)
   main.py                     CLI entrypoint (runs the Data stage)
 tests/                        pytest suite
 data/
-  run/                        Per-run output (data_agent_output.json, discovery_agent_output.json, gitignored)
+  run/                        Per-run output (data_agent_output.json, discovery_agent_output.json, news_agent_output.json, gitignored)
   snapshots/                  weekly_snapshot.json for the Trend Agent (gitignored)
 ```
 
@@ -91,6 +91,20 @@ flagged them. Output is provisional (`DiscoveryCandidate`, not
 Agent for real verification before they'd appear on a dashboard; that
 hand-off isn't wired up yet.
 
+## Running the News Agent
+
+```python
+from stock_agent.pipeline import run_news_stage
+events_by_symbol = run_news_stage()  # defaults to config/tickers.json
+```
+
+Pulls each ticker's 7-day news feed from Finnhub, classifies headlines and
+summaries into catalyst categories — earnings, M&A, guidance changes,
+leadership changes, analyst rating changes — via keyword matching, and
+returns a `NotableEvent` list per symbol. A ticker with no matching news
+gets an empty list rather than manufactured content, per DESIGN.md 6.3.
+Output is written to `data/run/news_agent_output.json`.
+
 ## Tests
 
 ```bash
@@ -101,6 +115,5 @@ pytest
 
 See DESIGN.md section 10 for the open build-phase decisions (exact
 crossover/overbought/oversold thresholds, dashboard delivery mechanism,
-web search backend, etc.). News Agent can be built next independently of
-those decisions; Trend and Synthesis need the threshold/delivery
-decisions first.
+web search backend, etc.) — those need answers before the Trend and
+Synthesis agents can be built.

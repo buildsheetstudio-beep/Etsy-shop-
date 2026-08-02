@@ -4,7 +4,7 @@
                       ├─→ Data Agent ─→ News Agent ─→ Trend Agent ─→ Synthesis Agent ─→ Dashboard
        (candidates) ──┘   (verifies)
 
-Data Agent and Discovery Agent are implemented; News/Trend/Synthesis are
+Data, Discovery, and News agents are implemented; Trend/Synthesis are
 still stubs that raise NotImplementedError. run_discovery_stage() takes a
 WebSearchProvider argument rather than defaulting to one, since which
 search backend to use is itself an open item (DESIGN.md section 10) — no
@@ -19,8 +19,9 @@ import logging
 from . import config, storage
 from .agents.data_agent import DataAgent
 from .agents.discovery_agent import DiscoveryAgent
+from .agents.news_agent import NewsAgent
 from .clients.websearch_client import WebSearchProvider
-from .models import DiscoveryCandidate, Ticker, TickerRecord
+from .models import DiscoveryCandidate, NotableEvent, Ticker, TickerRecord
 
 logger = logging.getLogger(__name__)
 
@@ -56,3 +57,31 @@ def run_discovery_stage(search_provider: WebSearchProvider) -> list[DiscoveryCan
     logger.info("Wrote %d candidates to %s", len(candidates), output_path)
 
     return candidates
+
+
+def run_news_stage(tickers: list[Ticker] | None = None) -> dict[str, list[NotableEvent]]:
+    if tickers is None:
+        tickers = storage.load_tickers(config.TICKERS_FILE)
+        logger.info("Loaded %d tickers from %s", len(tickers), config.TICKERS_FILE)
+
+    events_by_symbol = NewsAgent().run(tickers)
+
+    output_path = config.RUN_OUTPUT_DIR / "news_agent_output.json"
+    storage.save_json(
+        output_path,
+        {
+            "events": {
+                symbol: [dataclasses.asdict(e) for e in events]
+                for symbol, events in events_by_symbol.items()
+            }
+        },
+    )
+    total_events = sum(len(events) for events in events_by_symbol.values())
+    logger.info(
+        "Wrote %d notable events across %d tickers to %s",
+        total_events,
+        len(events_by_symbol),
+        output_path,
+    )
+
+    return events_by_symbol

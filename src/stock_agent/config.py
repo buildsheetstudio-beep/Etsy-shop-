@@ -49,3 +49,6 @@ DISCOVERY_SPECULATIVE_PRICE_CEILING = 5.0
 
 # How many web search results the Discovery Agent asks for per query.
 DISCOVERY_RESULTS_PER_QUERY = 10
+
+# DESIGN.md 6.3: "Pulls each ticker's news feed for the past 7 days".
+NEWS_LOOKBACK_DAYS = 7

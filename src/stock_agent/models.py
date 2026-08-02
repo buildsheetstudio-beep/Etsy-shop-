@@ -9,6 +9,7 @@ from typing import Literal, Optional
 TickerType = Literal["owned", "watchlist", "candidate"]
 SetupType = Literal["momentum_breakout", "oversold_bounce", "undervalued_fundamentals"]
 RiskTier = Literal["standard", "speculative", "unknown"]
+CatalystCategory = Literal["earnings", "m_and_a", "guidance", "leadership", "rating_change"]
 
 
 @dataclass
@@ -31,6 +32,23 @@ class DiscoveryCandidate:
     risk_tier: RiskTier = "unknown"
     price_hint: Optional[float] = None
     rationale: list[str] = field(default_factory=list)
+
+
+@dataclass
+class NotableEvent:
+    """One catalyst-flagged news item — DESIGN.md section 6.3.
+
+    A single article can match more than one category (e.g. an earnings
+    release that also raises guidance), so categories is a list rather
+    than one field.
+    """
+
+    categories: list[CatalystCategory]
+    headline: str
+    summary: str = ""
+    source: str = ""
+    url: str = ""
+    published_at: str = ""
 
 
 @dataclass
