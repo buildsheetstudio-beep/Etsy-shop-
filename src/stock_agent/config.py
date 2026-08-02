@@ -43,3 +43,9 @@ FINNHUB_MIN_SECONDS_BETWEEN_CALLS = 60 / 60
 
 # Twelve Data free tier: 800 calls/day, 8 calls/sec.
 TWELVEDATA_MIN_SECONDS_BETWEEN_CALLS = 1 / 8
+
+# DESIGN.md 6.1: "Speculative (<$5)" / "Standard (~$5+)".
+DISCOVERY_SPECULATIVE_PRICE_CEILING = 5.0
+
+# How many web search results the Discovery Agent asks for per query.
+DISCOVERY_RESULTS_PER_QUERY = 10

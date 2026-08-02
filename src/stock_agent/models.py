@@ -7,12 +7,30 @@ from datetime import datetime, timezone
 from typing import Literal, Optional
 
 TickerType = Literal["owned", "watchlist", "candidate"]
+SetupType = Literal["momentum_breakout", "oversold_bounce", "undervalued_fundamentals"]
+RiskTier = Literal["standard", "speculative", "unknown"]
 
 
 @dataclass
 class Ticker:
     symbol: str
     type: TickerType
+
+
+@dataclass
+class DiscoveryCandidate:
+    """Raw output of the Discovery Agent — DESIGN.md section 6.1.
+
+    Not yet verified: price_hint comes from whatever a search snippet
+    mentioned, not a real quote. The Data Agent re-fetches the real price
+    for these symbols before they reach the dashboard.
+    """
+
+    symbol: str
+    setup_types: list[SetupType] = field(default_factory=list)
+    risk_tier: RiskTier = "unknown"
+    price_hint: Optional[float] = None
+    rationale: list[str] = field(default_factory=list)
 
 
 @dataclass
