@@ -1,0 +1,5 @@
+[
+  { "symbol": "AAPL", "type": "owned" },
+  { "symbol": "MSFT", "type": "owned" },
+  { "symbol": "NVDA", "type": "watchlist" }
+]

@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.pytest_cache/
+
+# Weekly run artifacts (real snapshots/output are user data, not source)
+data/run/*.json
+!data/run/.gitkeep
+data/snapshots/*.json
+!data/snapshots/.gitkeep
