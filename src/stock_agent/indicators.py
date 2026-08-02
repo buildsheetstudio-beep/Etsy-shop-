@@ -38,3 +38,19 @@ def rsi(closes: Sequence[float], period: int = 14) -> Optional[float]:
         return 100.0
     rs = avg_gain / avg_loss
     return 100 - (100 / (1 + rs))
+
+
+def is_volume_spike(
+    volumes: Sequence[float], window: int = 20, multiplier: float = 2.0
+) -> Optional[bool]:
+    """True if the most recent bar's volume is at least `multiplier`x the
+    trailing `window`-bar average (excluding the most recent bar itself).
+    None if there isn't enough history to compute the average.
+    """
+    if len(volumes) < window + 1:
+        return None
+    trailing = volumes[-(window + 1) : -1]
+    avg = sum(trailing) / window
+    if avg == 0:
+        return None
+    return volumes[-1] >= multiplier * avg

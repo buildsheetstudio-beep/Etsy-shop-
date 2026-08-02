@@ -1,4 +1,4 @@
-from stock_agent.indicators import rsi, simple_moving_average
+from stock_agent.indicators import is_volume_spike, rsi, simple_moving_average
 
 
 def test_sma_insufficient_data_returns_none():
@@ -30,3 +30,22 @@ def test_rsi_mixed_is_between_0_and_100():
     value = rsi(closes, period=14)
     assert value is not None
     assert 0.0 < value < 100.0
+
+
+def test_volume_spike_insufficient_data_returns_none():
+    assert is_volume_spike([100] * 10, window=20) is None
+
+
+def test_volume_spike_detected():
+    volumes = [100] * 20 + [250]  # 2.5x the trailing 20-bar average of 100
+    assert is_volume_spike(volumes, window=20, multiplier=2.0) is True
+
+
+def test_volume_spike_not_detected():
+    volumes = [100] * 20 + [150]  # 1.5x, below the 2.0x multiplier
+    assert is_volume_spike(volumes, window=20, multiplier=2.0) is False
+
+
+def test_volume_spike_exactly_at_multiplier_counts_as_spike():
+    volumes = [100] * 20 + [200]  # exactly 2.0x
+    assert is_volume_spike(volumes, window=20, multiplier=2.0) is True

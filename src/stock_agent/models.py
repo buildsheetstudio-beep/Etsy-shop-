@@ -10,6 +10,8 @@ TickerType = Literal["owned", "watchlist", "candidate"]
 SetupType = Literal["momentum_breakout", "oversold_bounce", "undervalued_fundamentals"]
 RiskTier = Literal["standard", "speculative", "unknown"]
 CatalystCategory = Literal["earnings", "m_and_a", "guidance", "leadership", "rating_change"]
+RSIZone = Literal["oversold", "neutral", "overbought"]
+MACrossoverType = Literal["golden_cross", "death_cross"]
 
 
 @dataclass
@@ -94,6 +96,9 @@ class TickerRecord:
     ma_20: Optional[float] = None
     ma_50: Optional[float] = None
     rsi_14: Optional[float] = None
+    # None = not enough OHLCV history to compute, distinct from False
+    # ("computed, no spike"). See indicators.is_volume_spike.
+    volume_spike: Optional[bool] = None
 
     analyst: Optional[AnalystData] = None
 
@@ -105,3 +110,34 @@ class TickerRecord:
     # DESIGN.md section 3: "agents should fail gracefully (skip/retry)
     # rather than assume 100% uptime."
     errors: list[str] = field(default_factory=list)
+
+
+@dataclass
+class TrendResult:
+    """Week-over-week diff for one ticker — the Trend Agent's output
+    (DESIGN.md section 6.4). Only tickers judged `meaningful` are kept in
+    a run's returned list; the field is still carried on each result as a
+    record of why it survived the filter.
+    """
+
+    symbol: str
+    type: TickerType
+
+    is_new: bool = False  # no prior snapshot to diff against
+
+    price: Optional[float] = None
+    price_change_pct: Optional[float] = None
+
+    rsi_14: Optional[float] = None
+    rsi_zone: Optional[RSIZone] = None
+    rsi_zone_changed: bool = False
+
+    ma_crossover: Optional[MACrossoverType] = None
+    volume_spike: bool = False
+
+    rating_change: bool = False
+    price_target_revision_pct: Optional[float] = None
+
+    notable_events: list[NotableEvent] = field(default_factory=list)
+
+    meaningful: bool = True

@@ -1,10 +1,17 @@
 """Central configuration: API keys, file paths, and indicator parameters.
 
-Exact MA/RSI crossover thresholds are an explicit open item in DESIGN.md
-section 10 ("Define exact MA/RSI thresholds that count as 'crossover' /
-'overbought' / 'oversold'") — the Trend Agent owns that decision. This
-module only holds the window sizes the Data Agent needs to compute the
-raw indicator values.
+DESIGN.md section 10 leaves exact MA/RSI/volume thresholds as an open
+item. Resolved values below:
+- RSI oversold/overbought: <=30 / >=70 (standard Wilder convention)
+- MA crossover: sign flip of (MA20 - MA50) vs. last week, no magnitude
+  buffer — a crossover is a crossover regardless of how close the values
+  are. If choppy back-to-back cross/re-cross noise shows up in real
+  output, revisit with a buffer then rather than guessing one now.
+- Volume spike: most recent day's volume >= 2x the trailing 20-day
+  average (excluding today)
+- Price target revision: |change| >= 2% of last week's mean target
+- "Meaningful" price move for the Trend Agent's report filter: >= 3%
+  week-over-week
 """
 
 from __future__ import annotations
@@ -52,3 +59,11 @@ DISCOVERY_RESULTS_PER_QUERY = 10
 
 # DESIGN.md 6.3: "Pulls each ticker's news feed for the past 7 days".
 NEWS_LOOKBACK_DAYS = 7
+
+# DESIGN.md 10 open item — see module docstring for rationale.
+RSI_OVERSOLD = 30.0
+RSI_OVERBOUGHT = 70.0
+VOLUME_SPIKE_WINDOW = 20
+VOLUME_SPIKE_MULTIPLIER = 2.0
+PRICE_TARGET_REVISION_PCT = 0.02
+MEANINGFUL_PRICE_CHANGE_PCT = 0.03

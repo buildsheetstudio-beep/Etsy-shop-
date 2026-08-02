@@ -4,9 +4,9 @@
                       ├─→ Data Agent ─→ News Agent ─→ Trend Agent ─→ Synthesis Agent ─→ Dashboard
        (candidates) ──┘   (verifies)
 
-Data, Discovery, and News agents are implemented; Trend/Synthesis are
-still stubs that raise NotImplementedError. run_discovery_stage() takes a
-WebSearchProvider argument rather than defaulting to one, since which
+Data, Discovery, News, and Trend agents are implemented; Synthesis is
+still a stub that raises NotImplementedError. run_discovery_stage() takes
+a WebSearchProvider argument rather than defaulting to one, since which
 search backend to use is itself an open item (DESIGN.md section 10) — no
 default exists yet to wire in.
 """
@@ -20,8 +20,9 @@ from . import config, storage
 from .agents.data_agent import DataAgent
 from .agents.discovery_agent import DiscoveryAgent
 from .agents.news_agent import NewsAgent
+from .agents.trend_agent import TrendAgent
 from .clients.websearch_client import WebSearchProvider
-from .models import DiscoveryCandidate, NotableEvent, Ticker, TickerRecord
+from .models import DiscoveryCandidate, NotableEvent, Ticker, TickerRecord, TrendResult
 
 logger = logging.getLogger(__name__)
 
@@ -85,3 +86,30 @@ def run_news_stage(tickers: list[Ticker] | None = None) -> dict[str, list[Notabl
     )
 
     return events_by_symbol
+
+
+def run_trend_stage(
+    records: list[TickerRecord] | None = None,
+    news_by_symbol: dict[str, list[NotableEvent]] | None = None,
+) -> list[TrendResult]:
+    if records is None:
+        records = run_data_stage()
+    if news_by_symbol is None:
+        tickers = [Ticker(symbol=r.symbol, type=r.type) for r in records]
+        news_by_symbol = run_news_stage(tickers)
+
+    results = TrendAgent().run(records, news_by_symbol)
+
+    output_path = config.RUN_OUTPUT_DIR / "trend_agent_output.json"
+    storage.save_json(
+        output_path,
+        {"results": [dataclasses.asdict(r) for r in results]},
+    )
+    logger.info(
+        "Wrote %d meaningful trend results (of %d tickers) to %s",
+        len(results),
+        len(records),
+        output_path,
+    )
+
+    return results

@@ -7,9 +7,17 @@ and awareness only — no automated trading. Full design: [`DESIGN.md`](./DESIGN
 ## Status
 
 Scaffolding in progress. The **Data Agent** (section 6.2), **Discovery
-Agent** (section 6.1), and **News/Catalyst Agent** (section 6.3) are
-implemented and tested. Trend and Synthesis agents are stubbed
-(`NotImplementedError`) pending the open items in DESIGN.md section 10.
+Agent** (section 6.1), **News/Catalyst Agent** (section 6.3), and **Trend
+Agent** (section 6.4) are implemented and tested. Only the Synthesis
+Agent remains stubbed (`NotImplementedError`) — it needs a decision on
+dashboard delivery (DESIGN.md section 10) before it can be built.
+
+The Trend Agent resolves DESIGN.md section 10's threshold open item:
+RSI oversold/overbought at 30/70, MA crossover as a sign flip of
+(MA20 − MA50) with no magnitude buffer, volume spike at 2x the trailing
+20-day average, price-target revision at ±2%, and a ±3% weekly price
+move as the bar for "meaningful" in the report filter. See `config.py`
+for the exact constants and rationale.
 
 The Discovery Agent depends on a `WebSearchProvider` interface
 (`clients/websearch_client.py`) rather than a hardcoded vendor, since
@@ -26,9 +34,9 @@ DESIGN.md                     Full design doc
 config/
   tickers.example.json        Template — copy to tickers.json and edit
 src/stock_agent/
-  config.py                   API keys, file paths, indicator windows, risk-tier threshold
-  models.py                   Ticker / OHLCVBar / AnalystData / TickerRecord / DiscoveryCandidate
-  indicators.py                Local SMA + RSI computation
+  config.py                   API keys, file paths, indicator windows, all resolved thresholds
+  models.py                   Ticker / OHLCVBar / AnalystData / TickerRecord / DiscoveryCandidate / NotableEvent / TrendResult
+  indicators.py                Local SMA + RSI + volume-spike computation
   storage.py                  Ticker list + JSON snapshot I/O
   clients/
     finnhub_client.py         Primary data source
@@ -38,14 +46,14 @@ src/stock_agent/
     data_agent.py             Implemented — DESIGN.md 6.2
     discovery_agent.py        Implemented — DESIGN.md 6.1
     news_agent.py              Implemented — DESIGN.md 6.3
-    trend_agent.py              Stub — DESIGN.md 6.4
+    trend_agent.py              Implemented — DESIGN.md 6.4
     synthesis_agent.py          Stub — DESIGN.md 6.5
-  pipeline.py                 Wires agent stages together (Data + Discovery + News stages, so far)
+  pipeline.py                 Wires agent stages together (Data + Discovery + News + Trend, so far)
   main.py                     CLI entrypoint (runs the Data stage)
 tests/                        pytest suite
 data/
-  run/                        Per-run output (data_agent_output.json, discovery_agent_output.json, news_agent_output.json, gitignored)
-  snapshots/                  weekly_snapshot.json for the Trend Agent (gitignored)
+  run/                        Per-run output (*_agent_output.json, gitignored)
+  snapshots/                  weekly_snapshot.json for the Trend Agent's week-over-week diff (gitignored)
 ```
 
 ## Setup
@@ -105,6 +113,29 @@ returns a `NotableEvent` list per symbol. A ticker with no matching news
 gets an empty list rather than manufactured content, per DESIGN.md 6.3.
 Output is written to `data/run/news_agent_output.json`.
 
+## Running the Trend Agent
+
+```python
+from stock_agent.pipeline import run_trend_stage
+results = run_trend_stage()  # chains Data -> News -> Trend by default
+```
+
+Loads last week's snapshot (`data/snapshots/weekly_snapshot.json`), diffs
+this week's `TickerRecord`s against it (% price change, MA crossover,
+RSI zone change, rating change, price-target revision), carries through
+the Data Agent's volume-spike flag and the News Agent's notable events,
+and drops any ticker with no signal and no news — DESIGN.md 6.4's
+filtering layer. A ticker with no prior snapshot (first run, or a brand
+new Discovery candidate) is always kept, tagged `is_new=True`, since
+there's nothing to diff against yet. Overwrites the snapshot for next
+week's comparison and writes results to
+`data/run/trend_agent_output.json`.
+
+Note: DESIGN.md section 8 describes the snapshot as price/MA/RSI/analyst
+target; this implementation also stores each ticker's recommendation
+counts so rating changes are diffable week over week rather than only
+reflecting current sentiment — documented in `trend_agent.py`.
+
 ## Tests
 
 ```bash
@@ -113,7 +144,8 @@ pytest
 
 ## Next steps
 
-See DESIGN.md section 10 for the open build-phase decisions (exact
-crossover/overbought/oversold thresholds, dashboard delivery mechanism,
-web search backend, etc.) — those need answers before the Trend and
-Synthesis agents can be built.
+Only the **Synthesis Agent** (DESIGN.md 6.5) remains. It needs a
+decision on dashboard delivery (local file vs. email vs. both — DESIGN.md
+section 10) before the output format can be finalized, though the HTML
+dashboard itself can likely be built file-only first and delivery added
+later without much rework.

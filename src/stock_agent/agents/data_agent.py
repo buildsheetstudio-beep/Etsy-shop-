@@ -20,7 +20,7 @@ import logging
 from .. import config
 from ..clients.finnhub_client import FinnhubClient
 from ..clients.twelvedata_client import TwelveDataClient
-from ..indicators import rsi, simple_moving_average
+from ..indicators import is_volume_spike, rsi, simple_moving_average
 from ..models import AnalystData, Ticker, TickerRecord
 
 logger = logging.getLogger(__name__)
@@ -66,9 +66,13 @@ class DataAgent:
             if ohlcv[-1].volume is not None:
                 record.volume = ohlcv[-1].volume
             closes = [bar.close for bar in ohlcv]
+            volumes = [bar.volume for bar in ohlcv]
             record.ma_20 = simple_moving_average(closes, 20)
             record.ma_50 = simple_moving_average(closes, 50)
             record.rsi_14 = rsi(closes, config.RSI_PERIOD)
+            record.volume_spike = is_volume_spike(
+                volumes, config.VOLUME_SPIKE_WINDOW, config.VOLUME_SPIKE_MULTIPLIER
+            )
         else:
             record.errors.append("OHLCV unavailable from both Finnhub and Twelve Data")
 
