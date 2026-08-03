@@ -1,0 +1,72 @@
+name: Weekly Stock Research
+
+# DESIGN.md section 2: "Runs fully automated, weekly, via a scheduled
+# cron job." 11:00 UTC Mondays = 7am ET at the time this was set up
+# (EDT, UTC-4). GitHub Actions cron is always UTC and does not shift
+# with US daylight saving — adjust the hour by an hour twice a year if
+# you want it to stay pinned to 7am local time, or leave it and accept
+# an hour of drift each side of DST.
+on:
+  schedule:
+    - cron: "0 11 * * 1"
+  workflow_dispatch: {} # allows manually triggering a run from the Actions tab
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -e .
+
+      # Persists data/snapshots/weekly_snapshot.json across runs so the
+      # Trend Agent has last week's data to diff against (DESIGN.md
+      # section 8). A cache miss just means every ticker is treated as
+      # "new" for one week — degrades gracefully, doesn't break the run.
+      - name: Restore weekly snapshot
+        uses: actions/cache@v4
+        with:
+          path: data/snapshots
+          key: weekly-snapshot-${{ github.run_id }}
+          restore-keys: |
+            weekly-snapshot-
+
+      # config/tickers.json is gitignored (personal holdings, DESIGN.md
+      # section 4) and this repo is public, so the real ticker list is
+      # supplied via a secret rather than committed. Falls back to the
+      # example list if the secret isn't set, so the workflow still
+      # runs (against placeholder tickers) even before it's configured.
+      - name: Write ticker list
+        env:
+          TICKERS_JSON: ${{ secrets.TICKERS_JSON }}
+        run: |
+          mkdir -p config
+          if [ -n "$TICKERS_JSON" ]; then
+            printf '%s' "$TICKERS_JSON" > config/tickers.json
+          else
+            echo "::warning::TICKERS_JSON secret not set — using config/tickers.example.json instead of your real tickers."
+            cp config/tickers.example.json config/tickers.json
+          fi
+
+      - name: Run pipeline
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+        run: python -m stock_agent.main
+
+      - name: Upload dashboard
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-${{ github.run_number }}
+          path: data/run/dashboard.html
+          retention-days: 90

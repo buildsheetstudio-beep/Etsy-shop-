@@ -183,6 +183,43 @@ Written to `data/run/dashboard.html`. Each row is ranked within its
 section by a signal-strength score and color-coded bullish/green,
 bearish/red, or neutral/gray; notable news headlines are linked inline.
 
+## Weekly automation (GitHub Actions)
+
+`.github/workflows/weekly-research.yml` runs the full pipeline every
+Monday (DESIGN.md section 2's "scheduled cron job") and uploads
+`dashboard.html` as a downloadable workflow artifact. It also supports
+`workflow_dispatch`, so you can trigger a run manually from the Actions
+tab any time.
+
+**This repo must be private before you use this.** Actions artifacts,
+logs, and caches on a *public* repo are visible to anyone who can view
+the repo — that would mean your real ticker holdings and dashboard
+(prices, portfolio composition) are effectively public. Make the repo
+private first: repo → Settings → Danger Zone → Change visibility.
+
+Required repo secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Purpose |
+|---|---|
+| `FINNHUB_API_KEY` | Data Agent's primary source |
+| `TWELVEDATA_API_KEY` | Data Agent's OHLCV fallback |
+| `TAVILY_API_KEY` | Discovery Agent's web search backend |
+| `TICKERS_JSON` | The full contents of your real `config/tickers.json` — it's gitignored (personal holdings), so the workflow can't read it from the repo checkout. Without this secret, the workflow falls back to `config/tickers.example.json` and warns in the run log. |
+
+Every stage fails soft (DESIGN.md section 3), so a missing secret shows
+up as an empty dashboard section or a per-ticker error in that step's
+log, not a failed run.
+
+The weekly snapshot (`data/snapshots/weekly_snapshot.json`, needed for
+the Trend Agent's week-over-week diff) persists across runs via
+`actions/cache` rather than being committed — a cache miss just makes
+that week's tickers all read as "new" rather than breaking anything.
+
+The cron is set to 11:00 UTC Mondays (7am ET at setup time). GitHub
+Actions cron is always UTC and doesn't shift for daylight saving —
+adjust the hour by one twice a year if you want it pinned to a specific
+local time, or leave it and accept an hour of drift each side of DST.
+
 ## Tests
 
 ```bash
@@ -192,7 +229,6 @@ pytest
 ## Next steps
 
 All five agents are built and wired end to end with a real search
-backend. What's left is purely operational: set up the actual weekly
-cron job (DESIGN.md section 2) to call `python -m stock_agent.main`, and
-decide on email delivery for the dashboard if local-file-only isn't
-enough.
+backend, and the weekly run is automated via GitHub Actions. What's left
+is on your side: make the repo private, add the four secrets above, and
+decide if local-artifact delivery is enough or you want email too.
