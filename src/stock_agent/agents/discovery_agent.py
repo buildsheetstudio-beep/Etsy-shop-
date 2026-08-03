@@ -13,10 +13,12 @@ before appearing on the dashboard — not just a raw screener echo," so
 price_hint/risk_tier here are provisional, derived only from whatever a
 search snippet happened to mention.
 
-Which web search backend to use is an open item (DESIGN.md sections 3
-and 10: no provider is named, free tier is "N/A"). This agent depends on
-the WebSearchProvider protocol so any backend — Claude Code's own web
-search, a search API, etc. — can be wired in at call time.
+Which web search backend to use was an open item (DESIGN.md sections 3
+and 10: no provider was named, free tier "N/A") — resolved with Tavily
+(clients/tavily_client.py), an agent-oriented search API with a usable
+free tier. This agent still depends on the WebSearchProvider protocol
+rather than importing Tavily's client directly in its logic, so tests
+(and any future swap) can inject a different provider.
 """
 
 from __future__ import annotations
@@ -27,6 +29,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .. import config
+from ..clients.tavily_client import TavilySearchProvider
 from ..clients.websearch_client import WebSearchProvider
 from ..models import DiscoveryCandidate, RiskTier, SetupType
 
@@ -81,8 +84,8 @@ def _risk_tier(price_hint: Optional[float]) -> RiskTier:
 
 
 class DiscoveryAgent:
-    def __init__(self, search_provider: WebSearchProvider):
-        self._search = search_provider
+    def __init__(self, search_provider: WebSearchProvider | None = None):
+        self._search = search_provider or TavilySearchProvider()
 
     def run(self, excluded_symbols: set[str]) -> list[DiscoveryCandidate]:
         """excluded_symbols: tickers already owned/watchlisted — DESIGN.md

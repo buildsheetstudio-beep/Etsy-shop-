@@ -27,9 +27,11 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 
 FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY", "")
 TWELVEDATA_API_KEY = os.environ.get("TWELVEDATA_API_KEY", "")
+TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 
 FINNHUB_BASE_URL = "https://finnhub.io/api/v1"
 TWELVEDATA_BASE_URL = "https://api.twelvedata.com"
+TAVILY_BASE_URL = "https://api.tavily.com"
 
 TICKERS_FILE = ROOT_DIR / "config" / "tickers.json"
 SNAPSHOT_FILE = ROOT_DIR / "data" / "snapshots" / "weekly_snapshot.json"
@@ -57,6 +59,11 @@ DISCOVERY_SPECULATIVE_PRICE_CEILING = 5.0
 
 # How many web search results the Discovery Agent asks for per query.
 DISCOVERY_RESULTS_PER_QUERY = 10
+
+# Tavily doesn't publish a strict per-second rate limit (just a monthly
+# quota on the free tier), so this is a conservative default rather than
+# a documented vendor number, unlike the Finnhub/Twelve Data throttles.
+TAVILY_MIN_SECONDS_BETWEEN_CALLS = 1.0
 
 # DESIGN.md 6.3: "Pulls each ticker's news feed for the past 7 days".
 NEWS_LOOKBACK_DAYS = 7

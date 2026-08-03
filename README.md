@@ -7,8 +7,9 @@ and awareness only — no automated trading. Full design: [`DESIGN.md`](./DESIGN
 ## Status
 
 All five agents (DESIGN.md section 6) are implemented and tested: Data,
-Discovery, News/Catalyst, Trend, and Synthesis. The end-to-end pipeline
-runs and produces a real HTML dashboard file.
+Discovery, News/Catalyst, Trend, and Synthesis. `python -m stock_agent.main`
+runs the real end-to-end pipeline — including live web search for
+Discovery — and produces an actual HTML dashboard file.
 
 Dashboard delivery (DESIGN.md section 10) is **file-only for now** —
 the Synthesis Agent renders to `data/run/dashboard.html`; email delivery
@@ -27,13 +28,13 @@ RSI oversold/overbought at 30/70, MA crossover as a sign flip of
 move as the bar for "meaningful" in the report filter. See `config.py`
 for the exact constants and rationale.
 
-The Discovery Agent depends on a `WebSearchProvider` interface
-(`clients/websearch_client.py`) rather than a hardcoded vendor, since
-DESIGN.md doesn't name a web search backend (free tier: "N/A" — itself an
-open item). No concrete provider ships yet; `pipeline.run_discovery_stage`
-takes one as a required argument, and tests use a fake. Wiring a real
-backend (e.g. Claude Code's own web search, a search API) is the next
-step before this stage can run for real.
+The Discovery Agent's web search backend (DESIGN.md section 10's other
+open item — no vendor named, free tier "N/A") is resolved with **Tavily**
+(`clients/tavily_client.py`), chosen for its agent-oriented API (clean
+title/url/content results, no HTML scraping) and usable free tier (1,000
+searches/month). `DiscoveryAgent()` and `pipeline.run_discovery_stage()`
+default to it; both still accept an explicit `WebSearchProvider` if you
+want to swap backends or inject a fake for testing.
 
 ## Project layout
 
@@ -49,7 +50,8 @@ src/stock_agent/
   clients/
     finnhub_client.py         Primary data source
     twelvedata_client.py      Backup OHLCV / indicators
-    websearch_client.py       WebSearchProvider protocol — no concrete backend wired yet
+    tavily_client.py          Discovery Agent's web search backend
+    websearch_client.py       WebSearchProvider protocol Tavily (and any alternative) implements
   agents/
     data_agent.py             Implemented — DESIGN.md 6.2
     discovery_agent.py        Implemented — DESIGN.md 6.1
@@ -71,14 +73,31 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
 
-cp .env.example .env            # fill in FINNHUB_API_KEY / TWELVEDATA_API_KEY
+cp .env.example .env            # fill in FINNHUB_API_KEY / TWELVEDATA_API_KEY / TAVILY_API_KEY
 cp config/tickers.example.json config/tickers.json   # edit with your real tickers
 ```
 
-## Running the Data Agent
+`TAVILY_API_KEY` is only needed if you want Discovery's New Suggestions
+section populated with real candidates; every other part of the pipeline
+runs (and degrades gracefully) without it.
+
+## Running the full pipeline
 
 ```bash
 python -m stock_agent.main
+```
+
+Runs Discovery → Data → News → Trend → Synthesis end to end and writes
+`data/run/dashboard.html` — this is what the weekly cron job (DESIGN.md
+section 2) should invoke. Every stage fails soft: a missing API key or a
+dead endpoint shows up as an empty section or a per-ticker error, never
+a crash.
+
+## Running the Data Agent
+
+```python
+from stock_agent.pipeline import run_data_stage
+records = run_data_stage()
 ```
 
 Reads `config/tickers.json`, fetches quote / 52-week range / OHLCV / analyst
@@ -90,12 +109,9 @@ than aborting the run.
 
 ## Running the Discovery Agent
 
-Not runnable from the CLI yet — it needs a `WebSearchProvider` (see
-Status above). Once one exists:
-
 ```python
 from stock_agent.pipeline import run_discovery_stage
-candidates = run_discovery_stage(my_search_provider)
+candidates = run_discovery_stage()  # uses Tavily by default
 ```
 
 Runs three setup-type screeners (momentum/breakout, oversold bounce,
@@ -104,8 +120,8 @@ and a rough price from the result snippets, excludes anything already in
 `config/tickers.json`, and ranks candidates by how many setup types
 flagged them. Output is provisional (`DiscoveryCandidate`, not
 `TickerRecord`) — DESIGN.md 6.1 requires these to go through the Data
-Agent for real verification before they'd appear on a dashboard; that
-hand-off isn't wired up yet.
+Agent for real verification before they'd appear on a dashboard;
+`run_synthesis_stage()` handles that hand-off automatically.
 
 ## Running the News Agent
 
@@ -144,23 +160,23 @@ target; this implementation also stores each ticker's recommendation
 counts so rating changes are diffable week over week rather than only
 reflecting current sentiment — documented in `trend_agent.py`.
 
-## Running the Synthesis Agent (full pipeline)
+## Running the Synthesis Agent
 
 ```python
 from stock_agent.pipeline import run_synthesis_stage
-html = run_synthesis_stage()  # chains Data -> News -> Trend -> Synthesis
+html = run_synthesis_stage()  # chains Discovery -> Data -> News -> Trend -> Synthesis
 ```
 
-Combines Trend Agent results and (if a `WebSearchProvider` is passed)
-verified Discovery candidates into a single self-contained HTML
-dashboard with three ranked, color-coded sections — Your Holdings, Your
-Watchlist, New Suggestions — matching DESIGN.md 6.5/9. Without a search
-provider, New Suggestions renders empty (candidates need Discovery to
-run first); Holdings and Watchlist work either way:
+Combines Trend Agent results and verified Discovery candidates into a
+single self-contained HTML dashboard with three ranked, color-coded
+sections — Your Holdings, Your Watchlist, New Suggestions — matching
+DESIGN.md 6.5/9. Pass `include_suggestions=False` to skip Discovery
+entirely (no web search calls, New Suggestions renders empty), or
+`search_provider=` to use a different backend than Tavily:
 
 ```python
-from stock_agent.pipeline import run_synthesis_stage
-html = run_synthesis_stage(search_provider=my_search_provider)  # includes New Suggestions
+html = run_synthesis_stage(include_suggestions=False)          # Holdings/Watchlist only
+html = run_synthesis_stage(search_provider=my_search_provider)  # different backend
 ```
 
 Written to `data/run/dashboard.html`. Each row is ranked within its
@@ -175,8 +191,8 @@ pytest
 
 ## Next steps
 
-All five agents are built. What's left is operational, not architectural:
-wire a real `WebSearchProvider` (DESIGN.md section 10) so Discovery can
-run for real, decide on email delivery for the dashboard if wanted, and
-set up the actual weekly cron job (DESIGN.md section 2) to call
-`run_synthesis_stage`.
+All five agents are built and wired end to end with a real search
+backend. What's left is purely operational: set up the actual weekly
+cron job (DESIGN.md section 2) to call `python -m stock_agent.main`, and
+decide on email delivery for the dashboard if local-file-only isn't
+enough.

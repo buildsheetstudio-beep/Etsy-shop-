@@ -4,13 +4,13 @@
                       ├─→ Data Agent ─→ News Agent ─→ Trend Agent ─→ Synthesis Agent ─→ Dashboard
        (candidates) ──┘   (verifies)
 
-All five agents are implemented. run_discovery_stage() and the discovery
-path through run_synthesis_stage() take a WebSearchProvider argument
-rather than defaulting to one, since which search backend to use is
-itself an open item (DESIGN.md section 10) — no default exists yet to
-wire in. Without a provider, run_synthesis_stage() still produces a full
-dashboard for the Holdings and Watchlist sections; New Suggestions is
-just empty until Discovery is wired up.
+All five agents are implemented. DESIGN.md section 10's web-search-backend
+open item is resolved with Tavily (clients/tavily_client.py) — Discovery
+Agent and run_discovery_stage() default to it, so run_synthesis_stage()
+with no arguments now runs the real end-to-end pipeline, including New
+Suggestions. Pass include_suggestions=False to skip Discovery entirely
+(e.g. to avoid web search calls in a constrained environment), or pass a
+different search_provider to swap the backend.
 """
 
 from __future__ import annotations
@@ -47,7 +47,9 @@ def run_data_stage(tickers: list[Ticker] | None = None) -> list[TickerRecord]:
     return records
 
 
-def run_discovery_stage(search_provider: WebSearchProvider) -> list[DiscoveryCandidate]:
+def run_discovery_stage(
+    search_provider: WebSearchProvider | None = None,
+) -> list[DiscoveryCandidate]:
     tickers = storage.load_tickers(config.TICKERS_FILE)
     excluded_symbols = {t.symbol for t in tickers}
 
@@ -120,19 +122,19 @@ def run_trend_stage(
 
 def run_synthesis_stage(
     search_provider: WebSearchProvider | None = None,
+    include_suggestions: bool = True,
     trend_results: list[TrendResult] | None = None,
     candidates: list[DiscoveryCandidate] | None = None,
 ) -> str:
     """Renders the dashboard. If trend_results isn't supplied, chains the
-    earlier stages: with a search_provider, Discovery candidates are
-    verified through the Data Agent alongside owned/watchlist tickers so
-    "New Suggestions" is populated; without one, only Holdings/Watchlist
-    are populated (candidates stays empty — DESIGN.md section 10's open
-    item on the search backend).
+    earlier stages: when include_suggestions is True (the default),
+    Discovery candidates are verified through the Data Agent alongside
+    owned/watchlist tickers so "New Suggestions" is populated; set it to
+    False to skip Discovery (and its web search calls) entirely.
     """
     if trend_results is None:
         tickers = storage.load_tickers(config.TICKERS_FILE)
-        if search_provider is not None:
+        if include_suggestions:
             candidates = run_discovery_stage(search_provider)
             tickers = tickers + [Ticker(symbol=c.symbol, type="candidate") for c in candidates]
         else:

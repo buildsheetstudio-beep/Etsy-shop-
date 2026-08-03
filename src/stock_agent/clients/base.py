@@ -1,10 +1,10 @@
-"""Shared HTTP plumbing: rate-limited, fail-soft GET requests.
+"""Shared HTTP plumbing: rate-limited, fail-soft GET/POST requests.
 
 DESIGN.md section 3: free tiers are rate-limited and not guaranteed
 long-term stable, so "agents should fail gracefully (skip/retry) rather
-than assume 100% uptime." get_json() never raises for network/HTTP
-errors — it returns None and lets the caller record the failure on the
-TickerRecord instead of aborting the whole run.
+than assume 100% uptime." get_json()/post_json() never raise for
+network/HTTP errors — they return None and let the caller record the
+failure rather than aborting the whole run.
 """
 
 from __future__ import annotations
@@ -34,9 +34,15 @@ class RateLimitedClient:
             time.sleep(remaining)
 
     def get_json(self, url: str, params: dict) -> Optional[dict | list]:
+        return self._request("GET", url, params=params)
+
+    def post_json(self, url: str, json_body: dict) -> Optional[dict | list]:
+        return self._request("POST", url, json=json_body)
+
+    def _request(self, method: str, url: str, **kwargs) -> Optional[dict | list]:
         self._throttle()
         try:
-            response = self._session.get(url, params=params, timeout=self._timeout)
+            response = self._session.request(method, url, timeout=self._timeout, **kwargs)
             self._last_call_at = time.monotonic()
             response.raise_for_status()
             return response.json()
