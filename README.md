@@ -6,11 +6,19 @@ and awareness only — no automated trading. Full design: [`DESIGN.md`](./DESIGN
 
 ## Status
 
-Scaffolding in progress. The **Data Agent** (section 6.2), **Discovery
-Agent** (section 6.1), **News/Catalyst Agent** (section 6.3), and **Trend
-Agent** (section 6.4) are implemented and tested. Only the Synthesis
-Agent remains stubbed (`NotImplementedError`) — it needs a decision on
-dashboard delivery (DESIGN.md section 10) before it can be built.
+All five agents (DESIGN.md section 6) are implemented and tested: Data,
+Discovery, News/Catalyst, Trend, and Synthesis. The end-to-end pipeline
+runs and produces a real HTML dashboard file.
+
+Dashboard delivery (DESIGN.md section 10) is **file-only for now** —
+the Synthesis Agent renders to `data/run/dashboard.html`; email delivery
+was left for a later pass since it's additive to the existing file output,
+not a redesign of it. It also resolves a DESIGN.md open item on its own
+account: the doc calls for "hold / watch / reconsider" (Holdings) and
+"entry-signal" (Watchlist) framing without defining how signals map to
+those labels — see `config.py`'s `SYNTHESIS_*` constants for the
+resolution (a numeric signal-strength score plus bullish/bearish/neutral
+direction).
 
 The Trend Agent resolves DESIGN.md section 10's threshold open item:
 RSI oversold/overbought at 30/70, MA crossover as a sign flip of
@@ -47,12 +55,12 @@ src/stock_agent/
     discovery_agent.py        Implemented — DESIGN.md 6.1
     news_agent.py              Implemented — DESIGN.md 6.3
     trend_agent.py              Implemented — DESIGN.md 6.4
-    synthesis_agent.py          Stub — DESIGN.md 6.5
-  pipeline.py                 Wires agent stages together (Data + Discovery + News + Trend, so far)
+    synthesis_agent.py          Implemented — DESIGN.md 6.5
+  pipeline.py                 Wires all five agent stages together end to end
   main.py                     CLI entrypoint (runs the Data stage)
 tests/                        pytest suite
 data/
-  run/                        Per-run output (*_agent_output.json, gitignored)
+  run/                        Per-run output (*_agent_output.json, dashboard.html, gitignored)
   snapshots/                  weekly_snapshot.json for the Trend Agent's week-over-week diff (gitignored)
 ```
 
@@ -136,6 +144,29 @@ target; this implementation also stores each ticker's recommendation
 counts so rating changes are diffable week over week rather than only
 reflecting current sentiment — documented in `trend_agent.py`.
 
+## Running the Synthesis Agent (full pipeline)
+
+```python
+from stock_agent.pipeline import run_synthesis_stage
+html = run_synthesis_stage()  # chains Data -> News -> Trend -> Synthesis
+```
+
+Combines Trend Agent results and (if a `WebSearchProvider` is passed)
+verified Discovery candidates into a single self-contained HTML
+dashboard with three ranked, color-coded sections — Your Holdings, Your
+Watchlist, New Suggestions — matching DESIGN.md 6.5/9. Without a search
+provider, New Suggestions renders empty (candidates need Discovery to
+run first); Holdings and Watchlist work either way:
+
+```python
+from stock_agent.pipeline import run_synthesis_stage
+html = run_synthesis_stage(search_provider=my_search_provider)  # includes New Suggestions
+```
+
+Written to `data/run/dashboard.html`. Each row is ranked within its
+section by a signal-strength score and color-coded bullish/green,
+bearish/red, or neutral/gray; notable news headlines are linked inline.
+
 ## Tests
 
 ```bash
@@ -144,8 +175,8 @@ pytest
 
 ## Next steps
 
-Only the **Synthesis Agent** (DESIGN.md 6.5) remains. It needs a
-decision on dashboard delivery (local file vs. email vs. both — DESIGN.md
-section 10) before the output format can be finalized, though the HTML
-dashboard itself can likely be built file-only first and delivery added
-later without much rework.
+All five agents are built. What's left is operational, not architectural:
+wire a real `WebSearchProvider` (DESIGN.md section 10) so Discovery can
+run for real, decide on email delivery for the dashboard if wanted, and
+set up the actual weekly cron job (DESIGN.md section 2) to call
+`run_synthesis_stage`.

@@ -34,6 +34,7 @@ TWELVEDATA_BASE_URL = "https://api.twelvedata.com"
 TICKERS_FILE = ROOT_DIR / "config" / "tickers.json"
 SNAPSHOT_FILE = ROOT_DIR / "data" / "snapshots" / "weekly_snapshot.json"
 RUN_OUTPUT_DIR = ROOT_DIR / "data" / "run"
+DASHBOARD_FILE = RUN_OUTPUT_DIR / "dashboard.html"
 
 # DESIGN.md 6.2 asks for "~30 days OHLCV", but a 50-day MA needs 50+
 # trading days of history to be defined at all. We pull more calendar
@@ -67,3 +68,17 @@ VOLUME_SPIKE_WINDOW = 20
 VOLUME_SPIKE_MULTIPLIER = 2.0
 PRICE_TARGET_REVISION_PCT = 0.02
 MEANINGFUL_PRICE_CHANGE_PCT = 0.03
+
+# DESIGN.md 6.5 asks for "hold / watch / reconsider" (Holdings) and
+# "entry-signal" (Watchlist) framing but doesn't define the mapping from
+# signals to those labels. Resolved here the same way as the Trend Agent
+# thresholds: a numeric "strength" score (see synthesis_agent.py) plus a
+# bullish/bearish/neutral direction. Holdings: bearish direction at or
+# above RECONSIDER strength -> "reconsider"; bearish (any strength) or
+# strength at/above WATCH -> "watch"; otherwise "hold". Watchlist:
+# bullish direction at or above ENTRY strength -> "entry signal"; bullish
+# at/above POSSIBLE_ENTRY -> "possible entry"; otherwise "wait".
+SYNTHESIS_RECONSIDER_STRENGTH = 4.0
+SYNTHESIS_WATCH_STRENGTH = 2.0
+SYNTHESIS_ENTRY_STRENGTH = 4.0
+SYNTHESIS_POSSIBLE_ENTRY_STRENGTH = 2.0

@@ -4,11 +4,13 @@
                       ├─→ Data Agent ─→ News Agent ─→ Trend Agent ─→ Synthesis Agent ─→ Dashboard
        (candidates) ──┘   (verifies)
 
-Data, Discovery, News, and Trend agents are implemented; Synthesis is
-still a stub that raises NotImplementedError. run_discovery_stage() takes
-a WebSearchProvider argument rather than defaulting to one, since which
-search backend to use is itself an open item (DESIGN.md section 10) — no
-default exists yet to wire in.
+All five agents are implemented. run_discovery_stage() and the discovery
+path through run_synthesis_stage() take a WebSearchProvider argument
+rather than defaulting to one, since which search backend to use is
+itself an open item (DESIGN.md section 10) — no default exists yet to
+wire in. Without a provider, run_synthesis_stage() still produces a full
+dashboard for the Holdings and Watchlist sections; New Suggestions is
+just empty until Discovery is wired up.
 """
 
 from __future__ import annotations
@@ -20,6 +22,7 @@ from . import config, storage
 from .agents.data_agent import DataAgent
 from .agents.discovery_agent import DiscoveryAgent
 from .agents.news_agent import NewsAgent
+from .agents.synthesis_agent import SynthesisAgent
 from .agents.trend_agent import TrendAgent
 from .clients.websearch_client import WebSearchProvider
 from .models import DiscoveryCandidate, NotableEvent, Ticker, TickerRecord, TrendResult
@@ -113,3 +116,35 @@ def run_trend_stage(
     )
 
     return results
+
+
+def run_synthesis_stage(
+    search_provider: WebSearchProvider | None = None,
+    trend_results: list[TrendResult] | None = None,
+    candidates: list[DiscoveryCandidate] | None = None,
+) -> str:
+    """Renders the dashboard. If trend_results isn't supplied, chains the
+    earlier stages: with a search_provider, Discovery candidates are
+    verified through the Data Agent alongside owned/watchlist tickers so
+    "New Suggestions" is populated; without one, only Holdings/Watchlist
+    are populated (candidates stays empty — DESIGN.md section 10's open
+    item on the search backend).
+    """
+    if trend_results is None:
+        tickers = storage.load_tickers(config.TICKERS_FILE)
+        if search_provider is not None:
+            candidates = run_discovery_stage(search_provider)
+            tickers = tickers + [Ticker(symbol=c.symbol, type="candidate") for c in candidates]
+        else:
+            candidates = candidates or []
+        trend_results = run_trend_stage(records=run_data_stage(tickers))
+    else:
+        candidates = candidates or []
+
+    dashboard_html = SynthesisAgent().run(trend_results, candidates)
+
+    config.DASHBOARD_FILE.parent.mkdir(parents=True, exist_ok=True)
+    config.DASHBOARD_FILE.write_text(dashboard_html)
+    logger.info("Wrote dashboard to %s", config.DASHBOARD_FILE)
+
+    return dashboard_html
