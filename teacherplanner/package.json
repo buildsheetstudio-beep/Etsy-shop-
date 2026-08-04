@@ -1,0 +1,8 @@
+{
+  "name": "eventplannerv2",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "googleapis": "^105.0.0"
+  }
+}
