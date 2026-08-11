@@ -299,7 +299,7 @@ function generateDivRecords() {
   // 1. Monthly dividend net income — COLUMN
   charts.push({ addChart: { chart: {
     spec: { title: 'Monthly Dividend Income', basicChart: {
-      chartType: 'COLUMN', legendPosition: 'NONE',
+      chartType: 'COLUMN', legendPosition: 'NO_LEGEND',
       axis: [{ position: 'BOTTOM_AXIS', title: 'Month' },
              { position: 'LEFT_AXIS',   title: 'Net Dividends ($)' }],
       domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_MONCOLS, R_MEND, 0, 1)] } } }],
@@ -316,7 +316,7 @@ function generateDivRecords() {
   // 2. Cumulative dividends — LINE
   charts.push({ addChart: { chart: {
     spec: { title: 'Cumulative Dividends Received', basicChart: {
-      chartType: 'LINE', legendPosition: 'NONE',
+      chartType: 'LINE', legendPosition: 'NO_LEGEND',
       axis: [{ position: 'BOTTOM_AXIS', title: 'Month' },
              { position: 'LEFT_AXIS',   title: 'Cumulative ($)' }],
       domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_MONCOLS, R_MEND, 0, 1)] } } }],
@@ -333,7 +333,7 @@ function generateDivRecords() {
   // 3. Annual comparison — COLUMN
   charts.push({ addChart: { chart: {
     spec: { title: 'Annual Dividend Comparison', basicChart: {
-      chartType: 'COLUMN', legendPosition: 'NONE',
+      chartType: 'COLUMN', legendPosition: 'NO_LEGEND',
       axis: [{ position: 'BOTTOM_AXIS', title: 'Year' },
              { position: 'LEFT_AXIS',   title: 'Net Dividends ($)' }],
       domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_ANNCOLS, R_ANNDATA + 3, 0, 1)] } } }],

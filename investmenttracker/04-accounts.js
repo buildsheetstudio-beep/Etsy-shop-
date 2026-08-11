@@ -223,7 +223,7 @@ const ACCOUNTS = [
   }, index: 2 }});
 
   // Freeze rows 1:5 and columns A:C
-  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: 5, frozenColumnCount: 3 } }, fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount' }});
+  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: 5 } }, fields: 'gridProperties.frozenRowCount' }});
 
   await valuesBatchUpdate(id, vals, '04-accounts values');
   await batchUpdate(id, fmt, '04-accounts format');

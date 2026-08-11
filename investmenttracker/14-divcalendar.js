@@ -90,12 +90,12 @@ function monthFml(ticker_ref, month) {
   // Year label + dropdown
   vals.push({ range: `${S}!A${R_CTRL + 1}`, values: [['Select Year:', '2025']] });
   fmt.push({ repeatCell: { range: gridRange(SID, R_CTRL, R_CTRL + 1, 0, 1),
-    cell: { userEnteredFormat: { textFormat: { bold: true, fontSize: 10, color: hex(C.primary) },
+    cell: { userEnteredFormat: { textFormat: { bold: true, fontSize: 10, foregroundColor: hex(C.primary) },
       horizontalAlignment: 'RIGHT', verticalAlignment: 'MIDDLE' } },
     fields: 'userEnteredFormat' } });
   fmt.push({ repeatCell: { range: gridRange(SID, R_CTRL, R_CTRL + 1, 1, 2),
     cell: { userEnteredFormat: { backgroundColor: hex(C.input),
-      textFormat: { bold: true, fontSize: 12, color: hex(C.primary) },
+      textFormat: { bold: true, fontSize: 12, foregroundColor: hex(C.primary) },
       horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
       numberFormat: { type: 'NUMBER', pattern: '0' } } },
     fields: 'userEnteredFormat' } });
@@ -262,7 +262,7 @@ function monthFml(ticker_ref, month) {
   // 1. Monthly totals COLUMN chart
   charts.push({ addChart: { chart: {
     spec: { title: 'Monthly Dividend Totals', basicChart: {
-      chartType: 'COLUMN', legendPosition: 'NONE',
+      chartType: 'COLUMN', legendPosition: 'NO_LEGEND',
       axis: [{ position: 'BOTTOM_AXIS', title: 'Month' },
              { position: 'LEFT_AXIS',   title: 'Dividends ($)' }],
       domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_GCOLS, R_GCOLS + 1, 1, 13)] } } }],
@@ -293,7 +293,7 @@ function monthFml(ticker_ref, month) {
   // 3. Yield on Cost by security — BAR
   charts.push({ addChart: { chart: {
     spec: { title: 'Yield on Cost by Security', basicChart: {
-      chartType: 'BAR', legendPosition: 'NONE',
+      chartType: 'BAR', legendPosition: 'NO_LEGEND',
       axis: [{ position: 'LEFT_AXIS',   title: 'Security' },
              { position: 'BOTTOM_AXIS', title: 'Yield on Cost %' }],
       domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_GCOLS, R_GTOT, 0, 1)] } } }],

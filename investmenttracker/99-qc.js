@@ -1,12 +1,11 @@
 'use strict';
-const { getAuth, sheets, C } = require('./lib');
+const { sheets } = require('./lib');
+const fs = require('fs');
+const { id } = JSON.parse(fs.readFileSync(__dirname + '/spreadsheet.json'));
 
 async function main() {
-  const auth = await getAuth();
-  const svc = sheets({ version: 'v4', auth });
-
-  const meta = await svc.spreadsheets.get({
-    spreadsheetId: C.SS,
+  const meta = await sheets.spreadsheets.get({
+    spreadsheetId: id,
     includeGridData: false
   });
 
@@ -21,8 +20,8 @@ async function main() {
     // Fetch all cell values for this tab
     let res;
     try {
-      res = await svc.spreadsheets.values.get({
-        spreadsheetId: C.SS,
+      res = await sheets.spreadsheets.values.get({
+        spreadsheetId: id,
         range: `'${tab}'`,
         valueRenderOption: 'FORMATTED_VALUE'
       });

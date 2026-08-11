@@ -222,7 +222,7 @@ const SECURITIES = [
   }, index: 3 }});
 
   // Freeze rows 1:5, cols A:C
-  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: 5, frozenColumnCount: 3 } }, fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount' }});
+  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: 5 } }, fields: 'gridProperties.frozenRowCount' }});
 
   await valuesBatchUpdate(id, vals, '05-prices values');
   await batchUpdate(id, fmt, '05-prices format');

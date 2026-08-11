@@ -154,7 +154,7 @@ const GOALS = [
   // Number format: col # (center), Target+Current ($#,##0), Progress % (0%), dates (m/d/yyyy)
   fmt.push({ repeatCell: { range: gridRange(SID, R_GD0, R_GD_END + 1, 0, 1),
     cell: { userEnteredFormat: { horizontalAlignment: 'CENTER',
-      textFormat: { bold: true, color: hex(C.secText) } } },
+      textFormat: { bold: true, foregroundColor: hex(C.secText) } } },
     fields: 'userEnteredFormat' } });
   fmt.push({ repeatCell: { range: gridRange(SID, R_GD0, R_GD_END + 1, 6, 8),
     cell: { userEnteredFormat: { numberFormat: { type: 'NUMBER', pattern: '#,##0.##' },
@@ -250,14 +250,14 @@ const GOALS = [
   charts.push({ addChart: { chart: {
     spec: { title: 'Goal Progress', basicChart: {
       chartType: 'BAR',
-      legendPosition: 'NONE',
+      legendPosition: 'NO_LEGEND',
       axis: [
         { position: 'BOTTOM_AXIS', title: 'Progress %' },
         { position: 'LEFT_AXIS',   title: '' },
       ],
       domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_GCOLS, R_GD_END + 1, 1, 2)] } } }],
       series: [{ series: { sourceRange: { sources: [gridRange(SID, R_GCOLS, R_GD_END + 1, 8, 9)] } },
-        targetAxis: 'BOTTOM_AXIS', color: hex(C.primary) }],
+        targetAxis: 'BOTTOM_AXIS' }],
       headerCount: 1,
     } },
     position: { overlayPosition: {

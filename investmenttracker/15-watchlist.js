@@ -186,7 +186,7 @@ const RISK_LVLS  = ['Low','Moderate','High','Speculative','Not Assessed'];
   // Row # bold/center
   fmt.push({ repeatCell: { range: gridRange(SID, R_WD0, R_WD_END + 1, 0, 1),
     cell: { userEnteredFormat: { horizontalAlignment: 'CENTER',
-      textFormat: { bold: true, color: hex(C.secText) } } },
+      textFormat: { bold: true, foregroundColor: hex(C.secText) } } },
     fields: 'userEnteredFormat' } });
   // Ticker bold
   fmt.push({ repeatCell: { range: gridRange(SID, R_WD0, R_WD_END + 1, 1, 2),
@@ -316,7 +316,7 @@ const RISK_LVLS  = ['Low','Moderate','High','Speculative','Not Assessed'];
   // 1. Status breakdown — horizontal BAR
   charts.push({ addChart: { chart: {
     spec: { title: 'Watchlist by Status', basicChart: {
-      chartType: 'BAR', legendPosition: 'NONE',
+      chartType: 'BAR', legendPosition: 'NO_LEGEND',
       axis: [{ position: 'LEFT_AXIS', title: 'Status' },
              { position: 'BOTTOM_AXIS', title: 'Count' }],
       domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_STAT_COLS, STAT_RANGE_END, 17, 18)] } } }],
@@ -338,7 +338,7 @@ const RISK_LVLS  = ['Low','Moderate','High','Speculative','Not Assessed'];
       series: { sourceRange: { sources: [gridRange(SID, R_RISK_COLS, RISK_RANGE_END, 18, 19)] } },
     } },
     position: { overlayPosition: {
-      anchorCell: { sheetId: SID, rowIndex: R_GHDR, columnIndex: 16 },
+      anchorCell: { sheetId: SID, rowIndex: R_WHDR, columnIndex: 16 },
       widthPixels: 320, heightPixels: 220,
     } },
   } } });

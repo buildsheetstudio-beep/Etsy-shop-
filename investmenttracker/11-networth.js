@@ -522,7 +522,7 @@ function buildMonthlyLog() {
   charts.push({ addChart: { chart: {
     spec: { title: 'Year-over-Year Net Worth Growth', basicChart: {
       chartType: 'COLUMN',
-      legendPosition: 'NONE',
+      legendPosition: 'NO_LEGEND',
       axis: [
         { position: 'BOTTOM_AXIS', title: 'Month' },
         { position: 'LEFT_AXIS', title: 'YoY Change ($)' },

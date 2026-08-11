@@ -478,7 +478,7 @@ charts.push({
       spec: {
         title: 'Annual Dividends Received',
         basicChart: {
-          chartType: 'COLUMN', legendPosition: 'NONE',
+          chartType: 'COLUMN', legendPosition: 'NO_LEGEND',
           axis: [{ position: 'BOTTOM_AXIS', title: 'Year' }, { position: 'LEFT_AXIS', title: 'Dividends ($)' }],
           domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_KD0, R_KD_END+1, 0, 1)] } } }],
           series: [{ series: { sourceRange: { sources: [gridRange(SID, R_KD0, R_KD_END+1, 6, 7)] } }, targetAxis: 'LEFT_AXIS', color: CLR.success }],
@@ -497,7 +497,7 @@ charts.push({
       spec: {
         title: 'Year-End Net Worth Trend',
         basicChart: {
-          chartType: 'LINE', legendPosition: 'NONE',
+          chartType: 'LINE', legendPosition: 'NO_LEGEND',
           axis: [{ position: 'BOTTOM_AXIS', title: 'Year' }, { position: 'LEFT_AXIS', title: 'Net Worth ($)' }],
           domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_KD0, R_KD_END+1, 0, 1)] } } }],
           series: [{ series: { sourceRange: { sources: [gridRange(SID, R_KD0, R_KD_END+1, 1, 2)] } }, targetAxis: 'LEFT_AXIS', color: CLR.hdrA }],
@@ -516,7 +516,7 @@ charts.push({
       spec: {
         title: 'Annual Contributions',
         basicChart: {
-          chartType: 'COLUMN', legendPosition: 'NONE',
+          chartType: 'COLUMN', legendPosition: 'NO_LEGEND',
           axis: [{ position: 'BOTTOM_AXIS', title: 'Year' }, { position: 'LEFT_AXIS', title: 'Contributions ($)' }],
           domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_KD0, R_KD_END+1, 0, 1)] } } }],
           series: [{ series: { sourceRange: { sources: [gridRange(SID, R_KD0, R_KD_END+1, 5, 6)] } }, targetAxis: 'LEFT_AXIS', color: CLR.secondary }],
@@ -535,7 +535,7 @@ charts.push({
       spec: {
         title: 'Annual Portfolio Return %',
         basicChart: {
-          chartType: 'COLUMN', legendPosition: 'NONE',
+          chartType: 'COLUMN', legendPosition: 'NO_LEGEND',
           axis: [{ position: 'BOTTOM_AXIS', title: 'Year' }, { position: 'LEFT_AXIS', title: 'Return (%)' }],
           domains: [{ domain: { sourceRange: { sources: [gridRange(SID, R_KD0, R_KD_END+1, 0, 1)] } } }],
           series: [{ series: { sourceRange: { sources: [gridRange(SID, R_KD0, R_KD_END+1, 8, 9)] } }, targetAxis: 'LEFT_AXIS', color: CLR.warning }],

@@ -311,14 +311,6 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
     }}, fields: 'userEnteredFormat.backgroundColor' }});
   });
   // Year col bg (alternating already set by row loop)
-  // Highlight rows where Expected value crosses target (conditional)
-  fmt.push({ addConditionalFormatRule: { rule: {
-    ranges: [gridRange(SID, D0, DN, 3, 4)],
-    booleanRule: {
-      condition: { type: 'NUMBER_GREATER_THAN_EQ', values: [{ userEnteredValue: `=${TARGET}` }] },
-      format: { backgroundColor: hex(C.success), textFormat: { bold: true, foregroundColor: hex(C.primaryText) } },
-    },
-  }, index: 0 }});
   // Target column: soft styling
   fmt.push({ repeatCell: { range: gridRange(SID, D0, DN, 9, 10), cell: { userEnteredFormat: {
     textFormat: { italic: true, foregroundColor: hex(C.secText), fontFamily: 'Arial' },

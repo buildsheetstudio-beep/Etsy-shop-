@@ -521,7 +521,7 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
       titleTextFormat: { bold: true, fontSize: 11, fontFamily: 'Arial', foregroundColor: hex(C.primary) },
       basicChart: {
         chartType: 'COLUMN',
-        legendPosition: 'NONE',
+        legendPosition: 'NO_LEGEND',
         domains: [{ domain: {
           sourceRange: { sources: [{ sheetId: SID, startRowIndex: R_BICOLS, endRowIndex: R_BITOT, startColumnIndex: 0, endColumnIndex: 1 }] },
         }}],

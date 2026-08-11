@@ -317,7 +317,7 @@ function divFormula(r) {
   }, index: 3 }});
 
   // Freeze rows 1:5 and cols A:D
-  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: 5, frozenColumnCount: 4 } }, fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount' }});
+  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: 5 } }, fields: 'gridProperties.frozenRowCount' }});
 
   await valuesBatchUpdate(id, vals, '07-holdings values');
   await batchUpdate(id, fmt, '07-holdings format');

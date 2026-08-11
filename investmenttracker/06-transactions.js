@@ -440,7 +440,7 @@ function netCashFlow(txType, gross, fees, taxes) {
   }, index: 2 }});
 
   // Freeze rows 1:5 and cols A:D
-  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: 5, frozenColumnCount: 4 } }, fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount' }});
+  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: 5 } }, fields: 'gridProperties.frozenRowCount' }});
 
   await valuesBatchUpdate(id, vals, '06-transactions values');
   await batchUpdate(id, fmt, '06-transactions format');

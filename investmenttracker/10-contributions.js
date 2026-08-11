@@ -107,11 +107,12 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
     properties: { pixelSize: 20 }, fields: 'pixelSize' }});
 
   // ── Summary cards ─────────────────────────────────────────────────
+  const DATA_LAST = DATA_R1 + N - 1;
   const CARDS = [
-    { label: 'Your Contributions (Year)',  val: `=IFERROR(SUMPRODUCT(($C$${DATA_R1}:$C$500=${CTRL_CELL})*($I$${DATA_R1}:$I$500)),0)`, type: 'CURRENCY', pat: '$#,##0' },
-    { label: 'Employer Match (Year)',      val: `=IFERROR(SUMPRODUCT(($C$${DATA_R1}:$C$500=${CTRL_CELL})*($J$${DATA_R1}:$J$500)),0)`, type: 'CURRENCY', pat: '$#,##0' },
-    { label: 'Total w/ Match (Year)',      val: `=IFERROR(SUMPRODUCT(($C$${DATA_R1}:$C$500=${CTRL_CELL})*($K$${DATA_R1}:$K$500)),0)`, type: 'CURRENCY', pat: '$#,##0' },
-    { label: '% of Annual Goal',          val: `=IFERROR(SUMPRODUCT(($C$${DATA_R1}:$C$500=${CTRL_CELL})*($I$${DATA_R1}:$I$500))/${SETUP}!$B$13,0)`, type: 'PERCENT', pat: '0.0%' },
+    { label: 'Your Contributions (Year)',  val: `=IFERROR(SUMPRODUCT(($C$${DATA_R1}:$C$${DATA_LAST}=${CTRL_CELL})*($I$${DATA_R1}:$I$${DATA_LAST})),0)`, type: 'CURRENCY', pat: '$#,##0' },
+    { label: 'Employer Match (Year)',      val: `=IFERROR(SUMPRODUCT(($C$${DATA_R1}:$C$${DATA_LAST}=${CTRL_CELL})*($J$${DATA_R1}:$J$${DATA_LAST})),0)`, type: 'CURRENCY', pat: '$#,##0' },
+    { label: 'Total w/ Match (Year)',      val: `=IFERROR(SUMPRODUCT(($C$${DATA_R1}:$C$${DATA_LAST}=${CTRL_CELL})*($K$${DATA_R1}:$K$${DATA_LAST})),0)`, type: 'CURRENCY', pat: '$#,##0' },
+    { label: '% of Annual Goal',          val: `=IFERROR(SUMPRODUCT(($C$${DATA_R1}:$C$${DATA_LAST}=${CTRL_CELL})*($I$${DATA_R1}:$I$${DATA_LAST}))/${SETUP}!$B$13,0)`, type: 'PERCENT', pat: '0.0%' },
   ];
   const cardCols = [[0,3],[3,6],[6,9],[9,13]];
   CARDS.forEach((card, i) => {
@@ -178,7 +179,7 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
     properties: { pixelSize: 30 }, fields: 'pixelSize' }});
 
   // Freeze log header rows + col A-D
-  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: R_LOGCOLS+1, frozenColumnCount: 4 } }, fields: 'gridProperties.frozenRowCount,gridProperties.frozenColumnCount' }});
+  fmt.push({ updateSheetProperties: { properties: { sheetId: SID, gridProperties: { frozenRowCount: R_LOGCOLS+1 } }, fields: 'gridProperties.frozenRowCount' }});
 
   // ── Data values (push by column for efficiency) ───────────────────
   const fmtColB  = [];  // dates
@@ -301,7 +302,6 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
   }, index: 0 }});
 
   // ── Annual Summary ────────────────────────────────────────────────
-  const DATA_LAST = DATA_R1 + N - 1;  // last data row, 1-indexed
   const DATA_RNG  = `$${DATA_LAST + 100}`;  // generous range ceiling
 
   function sectionHdr(row, label, nc) {
@@ -326,10 +326,10 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
     const r0 = R_ANN_D0 + i;
     const r  = r0 + 1;
     const bg = i % 2 === 0 ? C.panel : C.altRow;
-    const DR  = `$C$${DATA_R1}:$C$500`;
-    const IRP = `$I$${DATA_R1}:$I$500`;
-    const JRP = `$J$${DATA_R1}:$J$500`;
-    const KRP = `$K$${DATA_R1}:$K$500`;
+    const DR  = `$C$${DATA_R1}:$C$${DATA_LAST}`;
+    const IRP = `$I$${DATA_R1}:$I$${DATA_LAST}`;
+    const JRP = `$J$${DATA_R1}:$J$${DATA_LAST}`;
+    const KRP = `$K$${DATA_R1}:$K$${DATA_LAST}`;
 
     vals.push({ range: `${S}!A${r}`, values: [[yr]] });
     vals.push({ range: `${S}!B${r}`, values: [[`=IFERROR(SUMPRODUCT((${DR}=${yr})*(${IRP})),0)`]] });
@@ -382,13 +382,13 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
     const r0 = R_ACC_D0 + i;
     const r  = r0 + 1;
     const bg = i % 2 === 0 ? C.panel : C.altRow;
-    const ER  = `$E$${DATA_R1}:$E$500`;
+    const ER  = `$E$${DATA_R1}:$E$${DATA_LAST}`;
 
     vals.push({ range: `${S}!A${r}`, values: [[acct]] });
     vals.push({ range: `${S}!B${r}`, values: [[`=IFERROR(VLOOKUP(A${r},${ACT}!$A$6:$B$305,2,FALSE),"")`]] });
     vals.push({ range: `${S}!C${r}`, values: [[`=IFERROR(VLOOKUP(A${r},${ACT}!$A$6:$C$305,3,FALSE),"")`]] });
-    vals.push({ range: `${S}!D${r}`, values: [[`=IFERROR(SUMPRODUCT((${ER}=A${r})*($I$${DATA_R1}:$I$500)),0)`]] });
-    vals.push({ range: `${S}!E${r}`, values: [[`=IFERROR(SUMPRODUCT((${ER}=A${r})*($J$${DATA_R1}:$J$500)),0)`]] });
+    vals.push({ range: `${S}!D${r}`, values: [[`=IFERROR(SUMPRODUCT((${ER}=A${r})*($I$${DATA_R1}:$I$${DATA_LAST})),0)`]] });
+    vals.push({ range: `${S}!E${r}`, values: [[`=IFERROR(SUMPRODUCT((${ER}=A${r})*($J$${DATA_R1}:$J$${DATA_LAST})),0)`]] });
     vals.push({ range: `${S}!F${r}`, values: [[`=IFERROR(D${r}+E${r},0)`]] });
 
     fmt.push({ repeatCell: { range: gridRange(SID, r0, r0+1, 0, 6), cell: { userEnteredFormat: {
@@ -431,13 +431,13 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
     const mo  = (m % 12) + 1;
     const lbl = `${MONTH_LABELS[mo-1]} ${yr}`;
     const r   = R_MON_D0 + m + 1;  // 1-indexed
-    const DR  = `$C$${DATA_R1}:$C$500`;
-    const MR  = `$D$${DATA_R1}:$D$500`;
+    const DR  = `$C$${DATA_R1}:$C$${DATA_LAST}`;
+    const MR  = `$D$${DATA_R1}:$D$${DATA_LAST}`;
     monthDataFormulas.A.push([yr]);
     monthDataFormulas.B.push([mo]);
     monthDataFormulas.C.push([lbl]);
-    monthDataFormulas.D.push([`=IFERROR(SUMPRODUCT((${DR}=${yr})*(${MR}=${mo})*($I$${DATA_R1}:$I$500)),0)`]);
-    monthDataFormulas.E.push([`=IFERROR(SUMPRODUCT((${DR}=${yr})*(${MR}=${mo})*($J$${DATA_R1}:$J$500)),0)`]);
+    monthDataFormulas.D.push([`=IFERROR(SUMPRODUCT((${DR}=${yr})*(${MR}=${mo})*($I$${DATA_R1}:$I$${DATA_LAST})),0)`]);
+    monthDataFormulas.E.push([`=IFERROR(SUMPRODUCT((${DR}=${yr})*(${MR}=${mo})*($J$${DATA_R1}:$J$${DATA_LAST})),0)`]);
   }
   vals.push({ range: `${S}!A${R_MON_D0+1}`, values: monthDataFormulas.A });
   vals.push({ range: `${S}!B${R_MON_D0+1}`, values: monthDataFormulas.B });
@@ -458,7 +458,7 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
       basicChart: {
         chartType: 'COLUMN',
         legendPosition: 'BOTTOM_LEGEND',
-        domains: [{ domain: { sourceRange: { sources: [{ sheetId: SID, startRowIndex: R_MON_COLS, endRowIndex: R_MON_END+1, startColumnIndex: 2, endColumnIndex: 3 }] }}}}],
+        domains: [{ domain: { sourceRange: { sources: [{ sheetId: SID, startRowIndex: R_MON_COLS, endRowIndex: R_MON_END+1, startColumnIndex: 2, endColumnIndex: 3 }] }}}],
         series: [
           { series: { sourceRange: { sources: [{ sheetId: SID, startRowIndex: R_MON_COLS, endRowIndex: R_MON_END+1, startColumnIndex: 3, endColumnIndex: 4 }] }}, targetAxis: 'LEFT_AXIS' },
           { series: { sourceRange: { sources: [{ sheetId: SID, startRowIndex: R_MON_COLS, endRowIndex: R_MON_END+1, startColumnIndex: 4, endColumnIndex: 5 }] }}, targetAxis: 'LEFT_AXIS' },
@@ -481,7 +481,7 @@ function colLetter(c) { return String.fromCharCode(65 + c); }
       basicChart: {
         chartType: 'COLUMN',
         legendPosition: 'BOTTOM_LEGEND',
-        domains: [{ domain: { sourceRange: { sources: [{ sheetId: SID, startRowIndex: R_ANN_COLS, endRowIndex: R_ANN_TOT, startColumnIndex: 0, endColumnIndex: 1 }] }}}}],
+        domains: [{ domain: { sourceRange: { sources: [{ sheetId: SID, startRowIndex: R_ANN_COLS, endRowIndex: R_ANN_TOT, startColumnIndex: 0, endColumnIndex: 1 }] }}}],
         series: [
           { series: { sourceRange: { sources: [{ sheetId: SID, startRowIndex: R_ANN_COLS, endRowIndex: R_ANN_TOT, startColumnIndex: 1, endColumnIndex: 2 }] }}, targetAxis: 'LEFT_AXIS' },
           { series: { sourceRange: { sources: [{ sheetId: SID, startRowIndex: R_ANN_COLS, endRowIndex: R_ANN_TOT, startColumnIndex: 2, endColumnIndex: 3 }] }}, targetAxis: 'LEFT_AXIS' },
