@@ -134,8 +134,8 @@ fmt.push({
   repeatCell: {
     range: gridRange(SID, R_NOTE, R_NOTE+1, 0, TOTAL_COLS),
     cell: { userEnteredFormat: {
-      backgroundColor: CLR.hdrB,
-      textFormat: { foregroundColor: CLR.white, italic: true, fontSize: 10 },
+      backgroundColor: CLR.info,
+      textFormat: { foregroundColor: CLR.text, italic: true, fontSize: 10 },
       horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE'
     }},
     fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
@@ -264,7 +264,7 @@ fmt.push({
   repeatCell: {
     range: gridRange(SID, R_KHDR, R_KHDR+1, 0, TOTAL_COLS),
     cell: { userEnteredFormat: {
-      backgroundColor: CLR.secondary,
+      backgroundColor: CLR.hdrA,
       textFormat: { foregroundColor: CLR.white, bold: true, fontSize: 12 },
       horizontalAlignment: 'LEFT', verticalAlignment: 'MIDDLE'
     }},
