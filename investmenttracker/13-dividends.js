@@ -39,7 +39,7 @@ function generateDivRecords() {
       if (p.mo !== null && !p.mo.includes(month)) return;
       const day   = p.freq === 'Monthly' ? 15 : 20;
       const gross = +(p.sh * p.dps).toFixed(2);
-      recs.push({ date:`${month}/${day}/${year}`, acct:p.a, sec:p.s, ticker:p.t,
+      recs.push({ date:`=DATE(${year},${month},${day})`, acct:p.a, sec:p.s, ticker:p.t,
         shares:p.sh, dps:p.dps, gross, tax:0, divType:'Regular',
         freq:p.freq, qual:p.qual, cost:p.cost, status:'Received' });
     });

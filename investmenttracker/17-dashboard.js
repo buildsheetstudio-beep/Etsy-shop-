@@ -143,8 +143,13 @@ fmt.push({
 
 // ── MERGES ────────────────────────────────────────────────────────────────────
 const NC = TOTAL_COLS;
-[R_TITLE, R_NOTE, R_DATE, R_PAHDR, R_PBHDR, R_PCHDR, R_PDHDR, R_PEHDR, R_PFHDR, R_DISC].forEach(r => {
+[R_TITLE, R_NOTE, R_DATE, R_PBHDR, R_PCHDR, R_PDHDR, R_PEHDR, R_PFHDR, R_DISC].forEach(r => {
   fmt.push({ mergeCells: { range: gridRange(SID, r, r+1, 0, NC), mergeType: 'MERGE_ALL' } });
+});
+// Unmerge any existing full-row merge on R_PAHDR, then split into 4 KPI label cells
+fmt.push({ unmergeCells: { range: gridRange(SID, R_PAHDR, R_PAHDR+1, 0, NC) } });
+[[0,3],[3,7],[7,10],[10,14]].forEach(([c1,c2]) => {
+  fmt.push({ mergeCells: { range: gridRange(SID, R_PAHDR, R_PAHDR+1, c1, c2), mergeType: 'MERGE_ALL' } });
 });
 
 // 4 big KPI cards (A-C, D-G, H-J, K-N)
@@ -512,8 +517,8 @@ vals.push({ range: `${S}!A1`, values: [['  Walsh Family Investment Dashboard']] 
 vals.push({ range: `${S}!A2`, values: [['All values are live — formulas pull automatically from Portfolio, Holdings, Dividends, Goals, and other tabs']] });
 vals.push({ range: `${S}!A3`, values: [[`=IFERROR("Last updated: "&TEXT(NOW(),"mmmm d, yyyy"),"")`]] });
 
-// Section A header + cards
-vals.push({ range: `${S}!A4`, values: [['  PORTFOLIO SNAPSHOT']] });
+// Section A — 4 KPI card labels (each label lands in its merged sub-cell)
+vals.push({ range: `${S}!A4`, values: [['TOTAL PORTFOLIO VALUE', '', '', 'TOTAL NET WORTH', '', '', '', 'UNREALIZED G/L (ALL TIME)', '', '', 'ANNUAL DIVIDENDS (2025)', '', '', '']] });
 
 const pfVal   = `IFERROR(SUM('Holdings'!$O$6:$O$1005),0)`;
 const costBas = `IFERROR(SUM('Holdings'!$L$6:$L$1005),0)`;
@@ -540,9 +545,9 @@ vals.push({
 
 // Asset class breakdown (A-F, rows PBD1-PBDN)
 const assetClasses = [
-  'Domestic Equity', 'International Equity', 'Fixed Income',
-  'Real Estate', 'Commodities', 'Crypto / Digital Assets',
-  'Cash & Equivalents', 'Other'
+  'U.S. Stocks', 'International Stocks', 'Bonds',
+  'Real Estate', 'Commodities', 'Cryptocurrency',
+  'Cash', 'Other'
 ];
 const allocationRows = assetClasses.map(ac => {
   const valFml  = `IFERROR(SUMPRODUCT(('Holdings'!$I$6:$I$1005="${ac}")*('Holdings'!$O$6:$O$1005)),0)`;
