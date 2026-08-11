@@ -524,7 +524,7 @@ const pfVal   = `IFERROR(SUM('Holdings'!$O$6:$O$1005),0)`;
 const costBas = `IFERROR(SUM('Holdings'!$L$6:$L$1005),0)`;
 const totNW   = `IFERROR('Net Worth Tracker'!$E$28,0)`;  // NW1=28, col E = Total
 const totalGL = `IFERROR(${pfVal}-${costBas},0)`;
-const annDiv  = `IFERROR(SUMPRODUCT((YEAR('Dividend Income'!$B$6:$B$2005)=2025)*('Dividend Income'!$S$6:$S$2005="Received")*('Dividend Income'!$O$6:$O$2005)),0)`;
+const annDiv  = `IFERROR(SUMPRODUCT((IFERROR(YEAR('Dividend Income'!$B$6:$B$2005),0)=2025)*('Dividend Income'!$S$6:$S$2005="Received")*('Dividend Income'!$O$6:$O$2005)),0)`;
 
 vals.push({
   range: `${S}!A${PA1}:N${PA1}`,
@@ -593,9 +593,9 @@ vals.push({ range: `${S}!A19:H19`, values: [['Owner / Group', '2023 Dividends', 
 
 const divByOwner = (owner, yr) => {
   if (owner === 'All') {
-    return `IFERROR(SUMPRODUCT((YEAR('Dividend Income'!$B$6:$B$2005)=${yr})*('Dividend Income'!$S$6:$S$2005="Received")*('Dividend Income'!$O$6:$O$2005)),0)`;
+    return `IFERROR(SUMPRODUCT((IFERROR(YEAR('Dividend Income'!$B$6:$B$2005),0)=${yr})*('Dividend Income'!$S$6:$S$2005="Received")*('Dividend Income'!$O$6:$O$2005)),0)`;
   }
-  return `IFERROR(SUMPRODUCT((YEAR('Dividend Income'!$B$6:$B$2005)=${yr})*('Dividend Income'!$H$6:$H$2005="${owner}")*('Dividend Income'!$S$6:$S$2005="Received")*('Dividend Income'!$O$6:$O$2005)),0)`;
+  return `IFERROR(SUMPRODUCT((IFERROR(YEAR('Dividend Income'!$B$6:$B$2005),0)=${yr})*('Dividend Income'!$H$6:$H$2005="${owner}")*('Dividend Income'!$S$6:$S$2005="Received")*('Dividend Income'!$O$6:$O$2005)),0)`;
 };
 
 const divRowDefs = [

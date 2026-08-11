@@ -41,8 +41,8 @@ const YEAR_CELL = '$B$4';
 function monthFml(ticker_ref, month) {
   const divRange = `${DIV}!$B$6:$B$2005`;
   return `=IFERROR(SUMPRODUCT(` +
-    `(YEAR(${divRange})=VALUE(${YEAR_CELL}))*` +
-    `(MONTH(${divRange})=${month})*` +
+    `(IFERROR(YEAR(${divRange}),0)=VALUE(${YEAR_CELL}))*` +
+    `(IFERROR(MONTH(${divRange}),0)=${month})*` +
     `(${DIV}!$C$6:$C$2005=${ticker_ref})*` +
     `(${DIV}!$S$6:$S$2005="Received")*` +
     `(${DIV}!$O$6:$O$2005)` +

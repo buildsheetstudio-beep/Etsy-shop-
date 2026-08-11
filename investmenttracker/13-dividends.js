@@ -80,9 +80,9 @@ function generateDivRecords() {
     properties: { pixelSize: 46 }, fields: 'pixelSize' } });
 
   // ── Summary cards (rows 2-3) — each 4-5 cols wide across A-S ────────────────
-  const total2024 = `=IFERROR(SUMPRODUCT((YEAR($B$${DD1}:$B$2005)=2024)*($S$${DD1}:$S$2005="Received")*($O$${DD1}:$O$2005)),0)`;
-  const total2025 = `=IFERROR(SUMPRODUCT((YEAR($B$${DD1}:$B$2005)=2025)*($S$${DD1}:$S$2005="Received")*($O$${DD1}:$O$2005)),0)`;
-  const total2026 = `=IFERROR(SUMPRODUCT((YEAR($B$${DD1}:$B$2005)=2026)*($S$${DD1}:$S$2005="Received")*($O$${DD1}:$O$2005)),0)`;
+  const total2024 = `=IFERROR(SUMPRODUCT((IFERROR(YEAR($B$${DD1}:$B$2005),0)=2024)*($S$${DD1}:$S$2005="Received")*($O$${DD1}:$O$2005)),0)`;
+  const total2025 = `=IFERROR(SUMPRODUCT((IFERROR(YEAR($B$${DD1}:$B$2005),0)=2025)*($S$${DD1}:$S$2005="Received")*($O$${DD1}:$O$2005)),0)`;
+  const total2026 = `=IFERROR(SUMPRODUCT((IFERROR(YEAR($B$${DD1}:$B$2005),0)=2026)*($S$${DD1}:$S$2005="Received")*($O$${DD1}:$O$2005)),0)`;
   const avgMo2025 = `=IFERROR(${total2025.slice(1)}/12,0)`;
 
   const cards = [
