@@ -1,0 +1,10 @@
+{
+  "name": "mealplanner2",
+  "version": "1.0.0",
+  "description": "Ultimate Weekly Meal Planner – Google Sheets build scripts",
+  "main": "index.js",
+  "scripts": {},
+  "dependencies": {
+    "googleapis": "^105.0.0"
+  }
+}
