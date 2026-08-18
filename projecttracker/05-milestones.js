@@ -169,9 +169,11 @@ const MILESTONES = [
   const pctFmls = Array.from({ length: N_ROWS }, (_, i) =>
     [`=IFERROR(COUNTIFS(${MTL}!$W$8:$W$3007,A${8+i},${MTL}!$N$8:$N$3007,"Complete")/COUNTIFS(${MTL}!$W$8:$W$3007,A${8+i}),"")`]);
 
-  vals.push({ range: `${S}!A8:A${7+N_ROWS}`, values: idFmls });
-  vals.push({ range: `${S}!C8:C${7+N_ROWS}`, values: nameFmls });
-  vals.push({ range: `${S}!I8:I${7+N_ROWS}`, values: pctFmls });
+  const fmlVals = [
+    { range: `${S}!A8:A${7+N_ROWS}`, values: idFmls },
+    { range: `${S}!C8:C${7+N_ROWS}`, values: nameFmls },
+    { range: `${S}!I8:I${7+N_ROWS}`, values: pctFmls },
+  ];
 
   // ── Number formats ────────────────────────────────────────────────────────
   fmt.push({ repeatCell: { range: gridRange(SID, 7, 1007, 5, 7), cell: { userEnteredFormat: { numberFormat: { type: 'DATE', pattern: 'mmm d, yyyy' } } }, fields: 'userEnteredFormat.numberFormat' } });
@@ -196,6 +198,7 @@ const MILESTONES = [
 
   await batchUpdate(id, fmt, 'ms-fmt');
   vals.push({ range: `${S}!A8`, values: MILESTONES });
+  fmlVals.forEach(fv => vals.push(fv));
   await valuesBatchUpdate(id, vals, 'ms-vals');
   console.log(`✓ Milestones & Progress complete — ${MILESTONES.length} milestones written`);
 })().catch(e => { console.error(e.message || e); process.exit(1); });

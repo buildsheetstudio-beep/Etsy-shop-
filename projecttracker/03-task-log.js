@@ -266,7 +266,7 @@ const TASKS = [
     ['Complete',       `=COUNTIFS(N8:N3007,"Complete")`],
     ['Overdue',        `=COUNTIFS(V8:V3007,TRUE)`],
     ['Blocked',        `=COUNTIFS(T8:T3007,TRUE)`],
-    ['Due This Week',  `=COUNTIFS(M8:M3007,">="&TODAY(),M8:M3007,"<="&(TODAY()+7),N8:N3007,"<>Complete",N8:N3007,"<>Cancelled")`],
+    ['Due This Week',  `=COUNTIFS(L8:L3007,">="&TODAY(),L8:L3007,"<="&(TODAY()+7),N8:N3007,"<>Complete",N8:N3007,"<>Cancelled")`],
   ];
   const statW = Math.floor(NC / stats.length);
   stats.forEach(([label, fml], i) => {
@@ -285,7 +285,7 @@ const TASKS = [
   // ── Column Headers row 6 (0-indexed = row 7) ────────────────────────────
   const COLS = [
     'Task ID','Project ID','Project Name','Task Type','Assignee','Task Name',
-    'Priority','Pct Complete','Important','Urgent','Start Date','Phase','Due Date','Status',
+    'Priority','Pct Complete','Important','Urgent','Start Date','Due Date','Phase','Status',
     'Dep Task ID','Est Hrs','Actual Hrs','Dep Type','Recurring','Blocked',
     'Rec Template','Overdue','Milestone ID','Days Rem','Notes','',
   ];
@@ -329,10 +329,11 @@ const TASKS = [
     [21, r => `=IF(AND(L${r}<>"",L${r}<TODAY(),N${r}<>"Complete",N${r}<>"Cancelled"),TRUE,FALSE)`],
     [23, r => `=IF(L${r}="","",IF(N${r}="Complete","Done",L${r}-TODAY()))`],
   ];
+  const fmlVals = [];
   fmlCols.forEach(([ci, gen]) => {
     const col = String.fromCharCode(65+ci);
     const formulas = Array.from({ length: 3000 }, (_, i) => [gen(8+i)]);
-    vals.push({ range: `${S}!${col}8:${col}3007`, values: formulas });
+    fmlVals.push({ range: `${S}!${col}8:${col}3007`, values: formulas });
   });
 
   // ── Number formats ────────────────────────────────────────────────────────
@@ -365,6 +366,7 @@ const TASKS = [
 
   // ── Sample task data ──────────────────────────────────────────────────────
   vals.push({ range: `${S}!A8`, values: TASKS });
+  fmlVals.forEach(fv => vals.push(fv));
 
   await valuesBatchUpdate(id, vals, 'tl-vals');
   console.log(`✓ Master Task Log complete — ${TASKS.length} tasks written`);

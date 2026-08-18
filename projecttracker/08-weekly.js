@@ -8,7 +8,7 @@ const MTL = "'Master Task Log'";
 const PS  = "'Project Setup'";
 // Week Start Date is at Project Setup row 5 (value row for control i=4)
 // 0-indexed row 5 = 1-indexed row 6, col A → PS!$A$6
-const WK  = `${PS}!$A$6`;
+const WK  = `${PS}!$G$6`;
 const PROJ = `${PS}!$A$4`;
 
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];

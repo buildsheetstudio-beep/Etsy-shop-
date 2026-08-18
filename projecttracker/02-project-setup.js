@@ -105,7 +105,7 @@ const NC = 26;
     [13, r => `=IFERROR(COUNTIFS(${MIL}!$B$8:$B$1007,$A${r}),0)`],
     [14, r => `=IFERROR(COUNTIFS(${MIL}!$B$8:$B$1007,$A${r},${MIL}!$H$8:$H$1007,"Achieved"),0)`],
     [15, r => `=IFERROR(O${r}/N${r},0)`],
-    [16, r => `=IFERROR(COUNTIFS(${MTL}!$B$8:$B$3007,$A${r},${MTL}!$M$8:$M$3007,"<"&TODAY(),${MTL}!$N$8:$N$3007,"<>Complete",${MTL}!$N$8:$N$3007,"<>Cancelled"),0)`],
+    [16, r => `=IFERROR(COUNTIFS(${MTL}!$B$8:$B$3007,$A${r},${MTL}!$L$8:$L$3007,"<"&TODAY(),${MTL}!$N$8:$N$3007,"<>Complete",${MTL}!$N$8:$N$3007,"<>Cancelled"),0)`],
     [17, r => `=IFERROR(COUNTIFS(${MTL}!$B$8:$B$3007,$A${r},${MTL}!$N$8:$N$3007,"Blocked"),0)`],
     [18, r => `=IFERROR(SUMIFS(${MTL}!$P$8:$P$3007,${MTL}!$B$8:$B$3007,$A${r}),0)`],
     [19, r => `=IFERROR(SUMIFS(${MTL}!$Q$8:$Q$3007,${MTL}!$B$8:$B$3007,$A${r}),0)`],
@@ -113,14 +113,15 @@ const NC = 26;
     [21, r => `=IFERROR(IF(G${r}="Complete",J${r}-I${r},IF(I${r}<TODAY(),TODAY()-I${r},"")),"—")`],
     [22, r => healthFml(r)],
     [23, r => `=IFERROR(INDEX(${MIL}!$D$8:$D$1007,MATCH(MINIFS(${MIL}!$F$8:$F$1007,${MIL}!$B$8:$B$1007,$A${r},${MIL}!$H$8:$H$1007,"<>Achieved",${MIL}!$H$8:$H$1007,"<>Cancelled",${MIL}!$F$8:$F$1007,">="&TODAY()),${MIL}!$F$8:$F$1007,0)),"—")`],
-    [24, r => `=IFERROR(INDEX(${MTL}!$F$8:$F$3007,MATCH(MINIFS(${MTL}!$M$8:$M$3007,${MTL}!$B$8:$B$3007,$A${r},${MTL}!$N$8:$N$3007,"<>Complete",${MTL}!$N$8:$N$3007,"<>Cancelled",${MTL}!$M$8:$M$3007,">="&TODAY()),${MTL}!$M$8:$M$3007,0)),"—")`],
+    [24, r => `=IFERROR(INDEX(${MTL}!$F$8:$F$3007,MATCH(MINIFS(${MTL}!$L$8:$L$3007,${MTL}!$B$8:$B$3007,$A${r},${MTL}!$N$8:$N$3007,"<>Complete",${MTL}!$N$8:$N$3007,"<>Cancelled",${MTL}!$L$8:$L$3007,">="&TODAY()),${MTL}!$L$8:$L$3007,0)),"—")`],
   ];
 
-  // Write formulas for all 500 rows
+  // Write formulas for all 500 rows — collected separately so data write precedes them
+  const fmlVals = [];
   fmlCols.forEach(([colIdx, fmlGen]) => {
     const colLetter = String.fromCharCode(65 + colIdx);
     const formulas = Array.from({ length: 500 }, (_, i) => [fmlGen(8 + i)]);
-    vals.push({ range: `${S}!${colLetter}8:${colLetter}507`, values: formulas });
+    fmlVals.push({ range: `${S}!${colLetter}8:${colLetter}507`, values: formulas });
   });
 
   // ── Number formats ────────────────────────────────────────────────────────
@@ -194,6 +195,7 @@ const NC = 26;
     return row;
   });
   vals.push({ range: `${S}!A8`, values: projectVals });
+  fmlVals.forEach(fv => vals.push(fv));
 
   await valuesBatchUpdate(id, vals, 'ps-vals');
   console.log('✓ Project Setup complete');
