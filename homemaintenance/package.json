@@ -1,0 +1,9 @@
+{
+  "name": "home-maintenance-tracker",
+  "version": "1.0.0",
+  "description": "Build scripts for Ultimate Home Maintenance Tracker Google Sheet",
+  "private": true,
+  "dependencies": {
+    "googleapis": "^105.0.0"
+  }
+}
