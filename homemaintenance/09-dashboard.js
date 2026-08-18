@@ -64,6 +64,7 @@ const NC = 14; // A-N
   for (const k of kpis) {
     fmt.push({ mergeCells: { range: gridRange(SID, 5, 6, k.col, k.col + k.span), mergeType: 'MERGE_ALL' } });
     fmt.push({ repeatCell: { range: gridRange(SID, 5, 6, k.col, k.col + k.span), cell: { userEnteredFormat: { backgroundColor: hex(k.color), textFormat: { bold: true, fontSize: 8, fontFamily: 'Arial', foregroundColor: hex(C.white) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
+    vals.push({ range: `${S}!${String.fromCharCode(65+k.col)}6`, values: [[k.label]] });
     fmt.push({ mergeCells: { range: gridRange(SID, 6, 7, k.col, k.col + k.span), mergeType: 'MERGE_ALL' } });
     fmt.push({ repeatCell: { range: gridRange(SID, 6, 7, k.col, k.col + k.span), cell: { userEnteredFormat: { backgroundColor: hex(C.bg), textFormat: { bold: true, fontSize: 22, fontFamily: 'Arial', foregroundColor: hex(C.text) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
   }
@@ -113,6 +114,7 @@ const NC = 14; // A-N
   for (const k of costKpis) {
     fmt.push({ mergeCells: { range: gridRange(SID, 9, 10, k.col, k.col + k.span), mergeType: 'MERGE_ALL' } });
     fmt.push({ repeatCell: { range: gridRange(SID, 9, 10, k.col, k.col + k.span), cell: { userEnteredFormat: { backgroundColor: hex(k.color), textFormat: { bold: true, fontSize: 8, fontFamily: 'Arial', foregroundColor: hex(C.white) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
+    vals.push({ range: `${S}!${String.fromCharCode(65+k.col)}10`, values: [[k.label]] });
     fmt.push({ mergeCells: { range: gridRange(SID, 10, 11, k.col, k.col + k.span), mergeType: 'MERGE_ALL' } });
     fmt.push({ repeatCell: { range: gridRange(SID, 10, 11, k.col, k.col + k.span), cell: { userEnteredFormat: { backgroundColor: hex(C.bg), textFormat: { bold: true, fontSize: 22, fontFamily: 'Arial', foregroundColor: hex(C.text) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' }, userEnteredFormat: { numberFormat: { type: 'CURRENCY', pattern: '"$"#,##0' }, backgroundColor: hex(C.bg), textFormat: { bold: true, fontSize: 22, fontFamily: 'Arial', foregroundColor: hex(C.text) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(numberFormat,backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
   }

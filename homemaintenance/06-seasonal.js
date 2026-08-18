@@ -88,7 +88,7 @@ const NC = 14; // A-N
 
   const filterRange = `${TASK}!A7:X1000`;
   // Season filter: if C45="" then all rows, else filter by season
-  const seasonFilter = `IF(${SETUP}!C45="",${TASK}!I7:I1000<>"",${TASK}!I7:I1000=${SETUP}!C45)`;
+  const seasonFilter = `IF(OR(${SETUP}!C45="",${SETUP}!C45="All"),${TASK}!I7:I1000<>"",${TASK}!I7:I1000=${SETUP}!C45)`;
   const propFilter   = `${TASK}!B7:B1000=${SETUP}!C42`;
 
   const colMap = [

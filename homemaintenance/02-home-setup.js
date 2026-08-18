@@ -135,9 +135,9 @@ const DISCLAIMER = 'Maintenance intervals, useful-life estimates, service recomm
     ['Open Maintenance Tasks',      `=COUNTIFS(${MTL}!$O$8:$O$3007,"<>Complete",${MTL}!$O$8:$O$3007,"<>Cancelled",${MTL}!$O$8:$O$3007,"<>Skipped",${MTL}!$B$8:$B$3007,C42,${MTL}!$F$8:$F$3007,"<>")`],
     ['Overdue Tasks',               `=COUNTIFS(${MTL}!$U$8:$U$3007,TRUE,${MTL}!$B$8:$B$3007,C42)`],
     ['Upcoming (Next 30 Days)',      `=COUNTIFS(${MTL}!$M$8:$M$3007,">="&TODAY(),${MTL}!$M$8:$M$3007,"<="&(TODAY()+30),${MTL}!$O$8:$O$3007,"<>Complete",${MTL}!$O$8:$O$3007,"<>Cancelled",${MTL}!$B$8:$B$3007,C42)`],
-    ['Repairs This Year',           `=SUMPRODUCT((YEAR(IF(${REP}!$H$8:$H$2007="",DATE(1900,1,1),${REP}!$H$8:$H$2007))=C43)*(${REP}!$B$8:$B$2007=C42)*(${REP}!$G$8:$G$2007<>""))`],
-    ['Maintenance Cost YTD',        `=IFERROR(SUMPRODUCT((YEAR(IF(${COSTS}!$B$8:$B$3007="",DATE(1900,1,1),${COSTS}!$B$8:$B$3007))=C43)*(${COSTS}!$E$8:$E$3007=C42)*(${COSTS}!$B$8:$B$3007<>"")*${COSTS}!$P$8:$P$3007),0)`],
-    ['Annual Budget Remaining',     `=IFERROR(VALUE(${BUDGET})-SUMPRODUCT((YEAR(IF(${COSTS}!$B$8:$B$3007="",DATE(1900,1,1),${COSTS}!$B$8:$B$3007))=C43)*(${COSTS}!$E$8:$E$3007=C42)*(${COSTS}!$B$8:$B$3007<>"")*${COSTS}!$P$8:$P$3007),"")`],
+    ['Repairs This Year',           `=SUMPRODUCT((YEAR(IF(${REP}!$J$8:$J$2007="",DATE(1900,1,1),${REP}!$J$8:$J$2007))=C43)*(${REP}!$B$8:$B$2007=C42)*(${REP}!$G$8:$G$2007<>""))`],
+    ['Maintenance Cost YTD',        `=IFERROR(SUMPRODUCT((YEAR(IF(${COSTS}!$C$8:$C$3007="",DATE(1900,1,1),${COSTS}!$C$8:$C$3007))=C43)*(${COSTS}!$B$8:$B$3007=C42)*(${COSTS}!$C$8:$C$3007<>"")*${COSTS}!$M$8:$M$3007),0)`],
+    ['Annual Budget Remaining',     `=IFERROR(VALUE(${BUDGET})-SUMPRODUCT((YEAR(IF(${COSTS}!$C$8:$C$3007="",DATE(1900,1,1),${COSTS}!$C$8:$C$3007))=C43)*(${COSTS}!$B$8:$B$3007=C42)*(${COSTS}!$C$8:$C$3007<>"")*${COSTS}!$M$8:$M$3007),"")`],
   ];
 
   cards.forEach(([label, fml], i) => {

@@ -129,6 +129,7 @@ const COSTS = [
   for (const k of kpiDefs) {
     fmt.push({ mergeCells: { range: gridRange(SID, 2, 3, k.col, k.col + k.span), mergeType: 'MERGE_ALL' } });
     fmt.push({ repeatCell: { range: gridRange(SID, 2, 3, k.col, k.col + k.span), cell: { userEnteredFormat: { backgroundColor: hex(k.color), textFormat: { bold: true, fontSize: 8, fontFamily: 'Arial', foregroundColor: hex(C.white) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
+    vals.push({ range: `${S}!${String.fromCharCode(65+k.col)}3`, values: [[k.label]] });
     fmt.push({ mergeCells: { range: gridRange(SID, 3, 4, k.col, k.col + k.span), mergeType: 'MERGE_ALL' } });
     fmt.push({ repeatCell: { range: gridRange(SID, 3, 4, k.col, k.col + k.span), cell: { userEnteredFormat: { backgroundColor: hex(C.bg), textFormat: { bold: true, fontSize: 18, fontFamily: 'Arial', foregroundColor: hex(C.text) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
   }

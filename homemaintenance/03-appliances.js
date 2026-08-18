@@ -119,6 +119,13 @@ const ASSETS = [
 
   // ── Data rows (rows 7-506, 0-indexed = 8-507) ─────────────────────────────
   const NDATA = 500;
+
+  // Write asset data FIRST so formula column writes below override the blanks
+  ASSETS.forEach((row, i) => {
+    const r1 = 8 + i;
+    vals.push({ range: `${S}!B${r1}:Y${r1}`, values: [row.slice(1)] });
+  });
+
   // Asset ID formula
   const astIdFmls = Array.from({ length: NDATA }, (_, i) => [`=IF(C${8+i}="","","AST-"&TEXT(ROW()-7,"0000"))`]);
   vals.push({ range: `${S}!A8:A507`, values: astIdFmls });
@@ -142,12 +149,6 @@ const ASSETS = [
   // Total Maintenance Cost (from Costs by Asset ID)
   const maintCostFmls = Array.from({ length: NDATA }, (_, i) => [`=IFERROR(SUMIF(${CST}!$F$8:$F$3007,A${8+i},${CST}!$P$8:$P$3007),0)`]);
   vals.push({ range: `${S}!U8:U507`, values: maintCostFmls });
-
-  // Write asset data
-  ASSETS.forEach((row, i) => {
-    const r1 = 8 + i;
-    vals.push({ range: `${S}!B${r1}:Y${r1}`, values: [row.slice(1)] });
-  });
 
   // ── Row styling ────────────────────────────────────────────────────────────
   fmt.push({ repeatCell: { range: gridRange(SID, 7, 7+NDATA, 0, NC), cell: { userEnteredFormat: { backgroundColor: hex(C.panel), textFormat: { fontSize: 8, fontFamily: 'Arial', foregroundColor: hex(C.text) }, verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,verticalAlignment)' } });

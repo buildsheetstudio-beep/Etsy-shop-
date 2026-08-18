@@ -145,7 +145,9 @@ const TEMPLATES = [
     fmt.push({ mergeCells: { range: gridRange(SID, 2, 3, k.col, k.col + k.span), mergeType: 'MERGE_ALL' } });
     fmt.push({ repeatCell: { range: gridRange(SID, 2, 3, k.col, k.col + k.span), cell: { userEnteredFormat: { backgroundColor: hex(k.color), textFormat: { bold: true, fontSize: 8, fontFamily: 'Arial', foregroundColor: hex(C.white) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
   }
-  vals.push({ range: `${S}!A3:Y3`, values: [kpiDefs.map(() => '').reduce((a, _, i) => { const k = kpiDefs.find(k2 => k2.col === i); if (k) a[i] = k.label; return a; }, Array(NC).fill(''))] });
+  for (const k of kpiDefs) {
+    vals.push({ range: `${S}!${colL(k.col)}3`, values: [[k.label]] });
+  }
 
   // ── KPI values row (row 3, 0-indexed) ────────────────────────────────────────
   const DATA_START = 6; // 1-indexed row where data starts (row 7)
