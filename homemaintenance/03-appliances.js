@@ -15,7 +15,7 @@ const NC = 25; // A-Y
 // T(19)=Total Repair Cost U(20)=Total Maint Cost V(21)=Replacement Cost Est
 // W(22)=Replacement Planning X(23)=Active Y(24)=Notes
 
-const A = (b,c,d,e,f,g,h,i,j,k,p,q,r,s,v,w=false,x=true,y='',n='') => {
+const A = (b,c,d,e,f,g,h,i,j,k,n,p,q,r,s,v,w=false,x=true,y='') => {
   const row = Array(25).fill('');
   row[1]=b; row[2]=c; row[3]=d; row[4]=e; row[5]=f; row[6]=g; row[7]=h;
   row[8]=i; row[9]=j; row[10]=k; row[13]=n||''; row[15]=p; row[16]=q; row[17]=r;
@@ -91,7 +91,7 @@ const ASSETS = [
     `=COUNTIFS($M$8:$M$507,"Expiring Soon",$X$8:$X$507,TRUE)`,
     `=COUNTIFS($P$8:$P$507,"Monitor",$X$8:$X$507,TRUE)`,
     `=COUNTIFS($W$8:$W$507,TRUE,$X$8:$X$507,TRUE)`,
-    `=IFERROR(SUMPRODUCT((YEAR(IF(${REP}!$H$8:$H$2007="",DATE(1900,1,1),${REP}!$H$8:$H$2007))=YEAR(TODAY()))*(${REP}!$G$8:$G$2007<>"")),0)`,
+    `=IFERROR(SUMPRODUCT((YEAR(IF(${REP}!$J$8:$J$2007="",DATE(1900,1,1),${REP}!$J$8:$J$2007))=YEAR(TODAY()))*(${REP}!$G$8:$G$2007<>"")),0)`,
     `=IFERROR(SUM($T$8:$T$507),0)`,
     `=IFERROR(SUMIFS($V$8:$V$507,$W$8:$W$507,TRUE),0)`,
   ];
@@ -143,11 +143,11 @@ const ASSETS = [
   vals.push({ range: `${S}!O8:O507`, values: replFmls });
 
   // Total Repair Cost (from Repair Log by Asset ID)
-  const repCostFmls = Array.from({ length: NDATA }, (_, i) => [`=IFERROR(SUMIF(${REP}!$C$8:$C$2007,A${8+i},${REP}!$R$8:$R$2007),0)`]);
+  const repCostFmls = Array.from({ length: NDATA }, (_, i) => [`=IFERROR(SUMIF(${REP}!$C$8:$C$2007,A${8+i},${REP}!$Q$8:$Q$2007),0)`]);
   vals.push({ range: `${S}!T8:T507`, values: repCostFmls });
 
   // Total Maintenance Cost (from Costs by Asset ID)
-  const maintCostFmls = Array.from({ length: NDATA }, (_, i) => [`=IFERROR(SUMIF(${CST}!$F$8:$F$3007,A${8+i},${CST}!$P$8:$P$3007),0)`]);
+  const maintCostFmls = Array.from({ length: NDATA }, (_, i) => [`=IFERROR(SUMIF(${CST}!$G$8:$G$3007,A${8+i},${CST}!$M$8:$M$3007),0)`]);
   vals.push({ range: `${S}!U8:U507`, values: maintCostFmls });
 
   // ── Row styling ────────────────────────────────────────────────────────────
