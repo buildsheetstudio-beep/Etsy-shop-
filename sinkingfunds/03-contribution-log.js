@@ -363,9 +363,9 @@ const TXNS = [
   ];
   kpiDefs.forEach(k => {
     fmt.push({ mergeCells: { range: gridRange(SID, 4, 5, k.col, k.col+3), mergeType: 'MERGE_ALL' } });
-    fmt.push({ mergeCells: { range: gridRange(SID, 5, 7, k.col, k.col+3), mergeType: 'MERGE_ALL' } });
+    fmt.push({ mergeCells: { range: gridRange(SID, 5, 6, k.col, k.col+3), mergeType: 'MERGE_ALL' } });
     fmt.push({ repeatCell: { range: gridRange(SID, 4, 5, k.col, k.col+3), cell: { userEnteredFormat: { backgroundColor: hex(C.secondary), textFormat: { bold: true, fontSize: 8, foregroundColor: hex(C.white) }, horizontalAlignment: 'CENTER', verticalAlignment: 'BOTTOM' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
-    fmt.push({ repeatCell: { range: gridRange(SID, 5, 7, k.col, k.col+3), cell: { userEnteredFormat: { backgroundColor: hex(C.secondary), textFormat: { bold: true, fontSize: 18, foregroundColor: hex(C.white) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
+    fmt.push({ repeatCell: { range: gridRange(SID, 5, 6, k.col, k.col+3), cell: { userEnteredFormat: { backgroundColor: hex(C.secondary), textFormat: { bold: true, fontSize: 18, foregroundColor: hex(C.white) }, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } }, fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)' } });
     vals.push({ range: `${S}!${colL(k.col)}5`, values: [[k.label]] });
     vals.push({ range: `${S}!${colL(k.col)}6`, values: [[k.fml]] });
   });
