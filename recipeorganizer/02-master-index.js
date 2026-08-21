@@ -239,7 +239,7 @@ const RECIPES = [
   // ── Freeze rows 1-7 and cols A-C ─────────────────────────────────────────────
   reqs.push({ updateSheetProperties: {
     properties: { sheetId: SID, gridProperties: { frozenRowCount: 7 } },
-    fields: 'gridProperties(frozenRowCount)',
+    fields: 'gridProperties.frozenRowCount',
   } });
 
   // ── Write recipe data rows ────────────────────────────────────────────────────

@@ -697,7 +697,7 @@ const INGREDIENTS = [
   // ── Freeze ───────────────────────────────────────────────────────────────────
   reqs.push({ updateSheetProperties: {
     properties: { sheetId: SID, gridProperties: { frozenRowCount: 7 } },
-    fields: 'gridProperties(frozenRowCount)',
+    fields: 'gridProperties.frozenRowCount',
   } });
 
   // ── Row height for data rows ─────────────────────────────────────────────────

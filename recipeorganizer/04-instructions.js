@@ -539,7 +539,7 @@ const STEPS = [
   // ── Freeze ────────────────────────────────────────────────────────────────────
   reqs.push({ updateSheetProperties: {
     properties: { sheetId: SID, gridProperties: { frozenRowCount: 7 } },
-    fields: 'gridProperties(frozenRowCount)',
+    fields: 'gridProperties.frozenRowCount',
   } });
   reqs.push({ updateDimensionProperties: {
     range: { sheetId: SID, dimension: 'ROWS', startIndex: 7, endIndex: 10007 },
