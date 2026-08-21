@@ -66,10 +66,10 @@ const RECIPE_ROWS = 60; // number of sample recipes in Master Recipe Index
 
   // ── Rows 5-6: KPI Cards (4 cards across cols A-S) ────────────────────────
   const kpiCards = [
-    { label: 'AVG RATING',       formula: `=IFERROR(ROUND(AVERAGEIF(${MRI}!$T$8:$T$2007,">=1"),1),"—")`,    cols: [0,4],  bg: C.butter },
+    { label: 'AVG RATING',       formula: `=IFERROR(ROUND(AVERAGEIF(${MRI}!$M$8:$M$2007,">=1"),1),"—")`,    cols: [0,4],  bg: C.butter },
     { label: 'TOTAL FAVORITES',  formula: `=IFERROR(COUNTIF(${MRI}!$O$8:$O$2007,TRUE),"—")`,                 cols: [5,10], bg: C.blush  },
-    { label: '5★ RECIPES',       formula: `=IFERROR(COUNTIF(${MRI}!$T$8:$T$2007,5),"—")`,                    cols: [10,15],bg: C.lavender},
-    { label: 'IN TESTING',       formula: `=IFERROR(COUNTIF(${MRI}!$N$8:$N$2007,"Testing"),"—")`,            cols: [15,20],bg: C.sage   },
+    { label: '5★ RECIPES',       formula: `=IFERROR(COUNTIF(${MRI}!$M$8:$M$2007,5),"—")`,                    cols: [10,15],bg: C.lavender},
+    { label: 'IN TESTING',       formula: `=IFERROR(COUNTIF(${MRI}!$AF$8:$AF$2007,"Testing"),"—")`,          cols: [15,20],bg: C.sage   },
   ];
   kpiCards.forEach(({ label, formula, cols: [c1, c2], bg }) => {
     // Label row (row 5, idx 4)
@@ -138,8 +138,8 @@ const RECIPE_ROWS = 60; // number of sample recipes in Master Recipe Index
     } });
     vals.push({ range: `${S}!A${r+1}:D${r+1}`, values: [[
       starLabels[i],
-      `=COUNTIF(${MRI}!$T$8:$T$2007,${star})`,
-      `=IFERROR(COUNTIF(${MRI}!$T$8:$T$2007,${star})/COUNTA(${MRI}!$B$8:$B$2007),"")`,
+      `=COUNTIF(${MRI}!$M$8:$M$2007,${star})`,
+      `=IFERROR(COUNTIF(${MRI}!$M$8:$M$2007,${star})/COUNTA(${MRI}!$B$8:$B$2007),"")`,
       '',
     ]] });
   });
@@ -175,7 +175,7 @@ const RECIPE_ROWS = 60; // number of sample recipes in Master Recipe Index
     } });
     vals.push({ range: `${S}!F${r+1}:J${r+1}`, values: [[
       st,
-      `=COUNTIF(${MRI}!$N$8:$N$2007,"${st}")`,
+      `=COUNTIF(${MRI}!$AF$8:$AF$2007,"${st}")`,
       '', '', '',
     ]] });
   });
@@ -194,11 +194,10 @@ const RECIPE_ROWS = 60; // number of sample recipes in Master Recipe Index
   vals.push({ range: `${S}!L8`, values: [['🏷️ SPECIAL FLAGS']] });
 
   const flags = [
-    ['❤️ Favorites', `=COUNTIF(${MRI}!$O$8:$O$2007,TRUE)`],
-    ['🌟 Seasonal',  `=COUNTIF(${MRI}!$P$8:$P$2007,TRUE)`],
-    ['❄️ Freezer',   `=COUNTIF(${MRI}!$Q$8:$Q$2007,TRUE)`],
-    ['👧 Kid-Friendly', `=COUNTIF(${MRI}!$R$8:$R$2007,TRUE)`],
-    ['🥡 Meal Prep', `=COUNTIF(${MRI}!$S$8:$S$2007,TRUE)`],
+    ['❤️ Favorites',    `=COUNTIF(${MRI}!$O$8:$O$2007,TRUE)`],
+    ['👧 Kid-Friendly', `=COUNTIF(${MRI}!$P$8:$P$2007,TRUE)`],
+    ['❄️ Freezer',      `=COUNTIF(${MRI}!$Q$8:$Q$2007,TRUE)`],
+    ['🥡 Meal Prep',    `=COUNTIF(${MRI}!$R$8:$R$2007,TRUE)`],
   ];
   flags.forEach(([label, formula], i) => {
     const r = 8 + i;
@@ -252,7 +251,7 @@ const RECIPE_ROWS = 60; // number of sample recipes in Master Recipe Index
 
   // Testing recipe rows: FILTER by Status="Testing" (rows 17-26, idx 16-25, 10 rows)
   const TEST_ROWS = 10;
-  const testFilter = `${MRI}!$N$8:$N$2007,"Testing"`;
+  const testFilter = `${MRI}!$AF$8:$AF$2007="Testing"`;
   for (let i = 0; i < TEST_ROWS; i++) {
     const r = 16 + i;
     const bg = i % 2 === 0 ? C.altRow : C.panel;
@@ -266,7 +265,7 @@ const RECIPE_ROWS = 60; // number of sample recipes in Master Recipe Index
       fields: 'userEnteredFormat(backgroundColor,textFormat,verticalAlignment)',
     } });
   }
-  const testCols = ['A', 'B', 'D', 'M', 'T', 'N'];
+  const testCols = ['A', 'B', 'C', 'L', 'M', 'AF'];
   testCols.forEach((mriCol, ci) => {
     const formulas = Array.from({length: TEST_ROWS}, (_, i) =>
       [`=IFERROR(INDEX(FILTER(${MRI}!$${mriCol}$8:$${mriCol}$2007,${testFilter}),${i+1}),"")`]);
@@ -320,7 +319,7 @@ const RECIPE_ROWS = 60; // number of sample recipes in Master Recipe Index
 
   // All recipe rows (rows 30-89, idx 29-88, 60 rows using INDEX from Master Recipe Index)
   // INDEX('Master Recipe Index'!$X$8:$X$2007, ROW()-29) at row 30 → INDEX(range, 1) = row 8 of MRI
-  const allCols = ['A', 'B', 'D', 'M', 'O', 'T', 'N', 'AA', 'AB', 'W'];
+  const allCols = ['A', 'B', 'C', 'L', 'O', 'M', 'AF', 'AE', 'AD', 'AA'];
   for (let i = 0; i < RECIPE_ROWS; i++) {
     const r = 29 + i;
     const bg = i % 2 === 0 ? C.altRow : C.panel;

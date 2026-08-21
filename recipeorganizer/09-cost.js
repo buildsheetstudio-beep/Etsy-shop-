@@ -223,7 +223,7 @@ const RECIPE_ROWS = 60;
   const pullCols = [
     { mriCol: 'A', targetCol: 0 }, // Recipe ID
     { mriCol: 'B', targetCol: 1 }, // Recipe Name
-    { mriCol: 'D', targetCol: 2 }, // Category
+    { mriCol: 'C', targetCol: 2 }, // Category
     { mriCol: 'H', targetCol: 3 }, // Servings
     { mriCol: 'Y', targetCol: 4 }, // Est. Cost/Batch
     { mriCol: 'Z', targetCol: 5 }, // Est. Cost/Serving

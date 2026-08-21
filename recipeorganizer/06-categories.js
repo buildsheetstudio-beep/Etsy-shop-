@@ -15,11 +15,11 @@ const MRI = "'Master Recipe Index'";
 const BROWSER_COLS = [
   { header: 'Recipe ID',   w: 85,  filterCol: 'A', label: 'Recipe ID'   },
   { header: 'Recipe Name', w: 220, filterCol: 'B', label: 'Recipe Name' },
-  { header: 'Meal Type',   w: 90,  filterCol: 'C', label: 'Meal Type'   },
-  { header: 'Cuisine',     w: 95,  filterCol: 'E', label: 'Cuisine'     },
-  { header: 'Difficulty',  w: 80,  filterCol: 'M', label: 'Difficulty'  },
-  { header: 'Rating',      w: 60,  filterCol: 'T', label: 'Rating'      },
-  { header: 'Status',      w: 75,  filterCol: 'N', label: 'Status'      },
+  { header: 'Meal Type',   w: 90,  filterCol: 'E', label: 'Meal Type'   },
+  { header: 'Cuisine',     w: 95,  filterCol: 'F', label: 'Cuisine'     },
+  { header: 'Difficulty',  w: 80,  filterCol: 'L', label: 'Difficulty'  },
+  { header: 'Rating',      w: 60,  filterCol: 'M', label: 'Rating'      },
+  { header: 'Status',      w: 75,  filterCol: 'AF', label: 'Status'     },
 ];
 
 const MEAL_TYPES   = ['Breakfast','Brunch','Lunch','Dinner','Snack','Appetizer','Side Dish','Dessert','Beverage','Sauce / Dressing','Other'];
@@ -120,10 +120,10 @@ const DIETARY_TAGS = ['No Restriction','Vegetarian','Vegan','Pescatarian','Glute
   };
 
   // Summary tables (all start at row index 4 = row 5 in sheets)
-  writeSummaryTable(0, 1, 4, 'MEAL TYPES', MEAL_TYPES, 'C');
-  writeSummaryTable(3, 4, 4, 'DIFFICULTY', DIFFICULTIES, 'M');
-  writeSummaryTable(6, 7, 4, 'CUISINES', CUISINES, 'E');
-  writeSummaryTable(9, 10, 4, 'DIETARY TAGS', DIETARY_TAGS, 'F');
+  writeSummaryTable(0, 1, 4, 'MEAL TYPES', MEAL_TYPES, 'E');
+  writeSummaryTable(3, 4, 4, 'DIFFICULTY', DIFFICULTIES, 'L');
+  writeSummaryTable(6, 7, 4, 'CUISINES', CUISINES, 'F');
+  writeSummaryTable(9, 10, 4, 'DIETARY TAGS', DIETARY_TAGS, 'S');
 
   // Row 25: spacer before browsers
   reqs.push({ repeatCell: {
@@ -214,7 +214,7 @@ const DIETARY_TAGS = ['No Restriction','Vegetarian','Vegan','Pescatarian','Glute
 
     // Data rows (r+3 to r+3+rowCount-1)
     const dataStart = r + 3;
-    const filterPredicate = `${MRI}!$${filterMriCol}$8:$${filterMriCol}$2007,${colL(selectorCellCol)}$${r+2}`;
+    const filterPredicate = `${MRI}!$${filterMriCol}$8:$${filterMriCol}$2007=${colL(selectorCellCol)}$${r+2}`;
 
     for (let i = 0; i < rowCount; i++) {
       const dr = dataStart + i;
@@ -247,7 +247,7 @@ const DIETARY_TAGS = ['No Restriction','Vegetarian','Vegan','Pescatarian','Glute
 
   nextRow = writeBrowser(nextRow,
     '🔍 BROWSE BY RECIPE CATEGORY',
-    'SELECT CATEGORY →', "='Reference Data'!$B$4:$B$32", 'D', 50, 3);
+    'SELECT CATEGORY →', "='Reference Data'!$B$4:$B$32", 'C', 50, 3);
 
   // Spacer
   reqs.push({ repeatCell: {
@@ -259,7 +259,7 @@ const DIETARY_TAGS = ['No Restriction','Vegetarian','Vegan','Pescatarian','Glute
 
   nextRow = writeBrowser(nextRow,
     '🌍 BROWSE BY CUISINE',
-    'SELECT CUISINE →', "='Reference Data'!$C$4:$C$22", 'E', 40, 3);
+    'SELECT CUISINE →', "='Reference Data'!$C$4:$C$22", 'F', 40, 3);
 
   reqs.push({ repeatCell: {
     range: gridRange(SID, nextRow, nextRow+1, 0, 20),
@@ -270,7 +270,7 @@ const DIETARY_TAGS = ['No Restriction','Vegetarian','Vegan','Pescatarian','Glute
 
   nextRow = writeBrowser(nextRow,
     '🥗 BROWSE BY DIETARY TAG',
-    'SELECT DIETARY TAG →', "='Reference Data'!$D$4:$D$18", 'F', 40, 3);
+    'SELECT DIETARY TAG →', "='Reference Data'!$D$4:$D$18", 'S', 40, 3);
 
   reqs.push({ repeatCell: {
     range: gridRange(SID, nextRow, nextRow+1, 0, 20),
@@ -281,7 +281,7 @@ const DIETARY_TAGS = ['No Restriction','Vegetarian','Vegan','Pescatarian','Glute
 
   nextRow = writeBrowser(nextRow,
     '⭐ BROWSE BY DIFFICULTY',
-    'SELECT DIFFICULTY →', "='Reference Data'!$G$4:$G$7", 'M', 20, 3);
+    'SELECT DIFFICULTY →', "='Reference Data'!$G$4:$G$7", 'L', 20, 3);
 
   // ── Column Widths ─────────────────────────────────────────────────────────
   const widths = [85, 220, 90, 95, 80, 60, 75, 40, 40, 120, 90, 40, 40, 40, 40, 40, 40, 40, 40, 40];

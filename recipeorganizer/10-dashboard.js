@@ -75,12 +75,12 @@ const CUISINES     = ['American','Italian','Mexican','Mediterranean','Greek','Fr
     [
       { label: 'TOTAL RECIPES',   formula: `=IFERROR(COUNTA(${MRI}!$B$8:$B$2007),0)`,                              bg: C.butter   },
       { label: 'TOTAL FAVORITES', formula: `=IFERROR(COUNTIF(${MRI}!$O$8:$O$2007,TRUE),0)`,                        bg: C.blush    },
-      { label: 'AVG RATING ★',   formula: `=IFERROR(ROUND(AVERAGEIF(${MRI}!$T$8:$T$2007,">=1"),1),"—")`,          bg: C.lavender },
-      { label: 'UNIQUE CUISINES', formula: `=IFERROR(SUMPRODUCT(1/COUNTIF(${MRI}!$E$8:$E$67,${MRI}!$E$8:$E$67)),0)`, bg: C.sage  },
+      { label: 'AVG RATING ★',   formula: `=IFERROR(ROUND(AVERAGEIF(${MRI}!$M$8:$M$2007,">=1"),1),"—")`,          bg: C.lavender },
+      { label: 'UNIQUE CUISINES', formula: `=IFERROR(SUMPRODUCT((LEN(${MRI}!$F$8:$F$2007)>0)/COUNTIF(${MRI}!$F$8:$F$2007,${MRI}!$F$8:$F$2007&"")),0)`, bg: C.sage  },
     ],
     [
-      { label: 'IN TESTING',     formula: `=IFERROR(COUNTIF(${MRI}!$N$8:$N$2007,"Testing"),0)`,                   bg: C.warning  },
-      { label: '5★ RECIPES',     formula: `=IFERROR(COUNTIF(${MRI}!$T$8:$T$2007,5),0)`,                           bg: C.butter   },
+      { label: 'IN TESTING',     formula: `=IFERROR(COUNTIF(${MRI}!$AF$8:$AF$2007,"Testing"),0)`,                 bg: C.warning  },
+      { label: '5★ RECIPES',     formula: `=IFERROR(COUNTIF(${MRI}!$M$8:$M$2007,5),0)`,                           bg: C.butter   },
       { label: 'AVG TOTAL TIME', formula: `=IFERROR(ROUND(AVERAGEIF(${MRI}!$B$8:$B$2007,"<>",${MRI}!$K$8:$K$2007),0)&" min","—")`, bg: C.info },
       { label: 'FREEZER MEALS',  formula: `=IFERROR(COUNTIF(${MRI}!$Q$8:$Q$2007,TRUE),0)`,                        bg: C.sage     },
     ],
@@ -157,13 +157,13 @@ const CUISINES     = ['American','Italian','Mexican','Mediterranean','Greek','Fr
   // LEFT PANEL: Featured Recipe (cols 0-4, A-E)
   const featFields = [
     { label: '📖', formula: featField('B'), fontSize: 14, bold: true, fg: C.primaryDeep },
-    { label: 'Category', formula: featField('D'), fontSize: 9,  bold: false, fg: C.text },
-    { label: 'Meal Type', formula: featField('C'), fontSize: 9,  bold: false, fg: C.text },
+    { label: 'Category', formula: featField('C'), fontSize: 9,  bold: false, fg: C.text },
+    { label: 'Meal Type', formula: featField('E'), fontSize: 9,  bold: false, fg: C.text },
     { label: 'Prep/Cook', formula: `=IFERROR("⏱ "&INDEX(${MRI}!$I$8:$I$2007,${FEAT_IDX})&" + "&INDEX(${MRI}!$J$8:$J$2007,${FEAT_IDX})&" min","")`, fontSize: 9, bold: false, fg: C.text },
-    { label: 'Difficulty', formula: featField('M'), fontSize: 9, bold: false, fg: C.text },
-    { label: 'Rating', formula: `=IFERROR("★ "&INDEX(${MRI}!$T$8:$T$2007,${FEAT_IDX})&" / 5","")`, fontSize: 9, bold: false, fg: C.warning },
-    { label: 'Dietary', formula: featField('F'), fontSize: 9, bold: false, fg: C.text },
-    { label: 'Description', formula: featField('AE'), fontSize: 8, bold: false, fg: C.secText },
+    { label: 'Difficulty', formula: featField('L'), fontSize: 9, bold: false, fg: C.text },
+    { label: 'Rating', formula: `=IFERROR("★ "&INDEX(${MRI}!$M$8:$M$2007,${FEAT_IDX})&" / 5","")`, fontSize: 9, bold: false, fg: C.warning },
+    { label: 'Dietary', formula: featField('S'), fontSize: 9, bold: false, fg: C.text },
+    { label: 'Description', formula: featField('AH'), fontSize: 8, bold: false, fg: C.secText },
   ];
   featFields.forEach(({ label, formula, fontSize, bold, fg }, i) => {
     const r = 10 + i;
@@ -225,8 +225,8 @@ const CUISINES     = ['American','Italian','Mexican','Mediterranean','Greek','Fr
     } });
     vals.push({ range: `${S}!H${r+1}:J${r+1}`, values: [[
       `=IFERROR(INDEX(${MRI}!$B$8:$B$2007,${mriRow}),"")`,
-      `=IFERROR(TEXT(INDEX(${MRI}!$U$8:$U$2007,${mriRow}),"mmm d, yyyy"),"")`,
-      `=IFERROR(INDEX(${MRI}!$T$8:$T$2007,${mriRow}),"")`,
+      `=IFERROR(TEXT(INDEX(${MRI}!$AC$8:$AC$2007,${mriRow}),"mmm d, yyyy"),"")`,
+      `=IFERROR(INDEX(${MRI}!$M$8:$M$2007,${mriRow}),"")`,
     ]] });
   }
 
@@ -258,11 +258,11 @@ const CUISINES     = ['American','Italian','Mexican','Mediterranean','Greek','Fr
       } },
       fields: 'userEnteredFormat(backgroundColor,textFormat,verticalAlignment)',
     } });
-    const filt = `${MRI}!$T$8:$T$2007=5,${MRI}!$O$8:$O$2007=TRUE`;
+    const filt = `${MRI}!$M$8:$M$2007=5,${MRI}!$O$8:$O$2007=TRUE`;
     vals.push({ range: `${S}!O${r+1}:Q${r+1}`, values: [[
       `=IFERROR(INDEX(FILTER(${MRI}!$B$8:$B$2007,${filt}),${N}),"")`,
-      `=IFERROR(INDEX(FILTER(${MRI}!$T$8:$T$2007,${filt}),${N}),"")`,
-      `=IFERROR(INDEX(FILTER(${MRI}!$D$8:$D$2007,${filt}),${N}),"")`,
+      `=IFERROR(INDEX(FILTER(${MRI}!$M$8:$M$2007,${filt}),${N}),"")`,
+      `=IFERROR(INDEX(FILTER(${MRI}!$C$8:$C$2007,${filt}),${N}),"")`,
     ]] });
   }
 
@@ -315,16 +315,16 @@ const CUISINES     = ['American','Italian','Mexican','Mediterranean','Greek','Fr
       } },
       fields: 'userEnteredFormat(backgroundColor,textFormat,verticalAlignment)',
     } });
-    // Use LARGE on AB (LastCooked) to get Nth most recent date, then INDEX/MATCH to find recipe
-    const dateFormula = `IFERROR(LARGE(${MRI}!$AB$8:$AB$2007,${N}),0)`;
-    const matchFormula = `IFERROR(MATCH(${dateFormula},${MRI}!$AB$8:$AB$2007,0),1)`;
+    // Use LARGE on AD (LastCooked) to get Nth most recent date, then INDEX/MATCH to find recipe
+    const dateFormula = `IFERROR(LARGE(${MRI}!$AD$8:$AD$2007,${N}),0)`;
+    const matchFormula = `IFERROR(MATCH(${dateFormula},${MRI}!$AD$8:$AD$2007,0),1)`;
     vals.push({ range: `${S}!A${r+1}:F${r+1}`, values: [[
       `=IFERROR(INDEX(${MRI}!$B$8:$B$2007,${matchFormula}),"")`,
-      `=IFERROR(INDEX(${MRI}!$D$8:$D$2007,${matchFormula}),"")`,
-      `=IFERROR(INDEX(${MRI}!$M$8:$M$2007,${matchFormula}),"")`,
+      `=IFERROR(INDEX(${MRI}!$C$8:$C$2007,${matchFormula}),"")`,
+      `=IFERROR(INDEX(${MRI}!$L$8:$L$2007,${matchFormula}),"")`,
       `=IFERROR(TEXT(${dateFormula},"mmm d, yyyy"),"")`,
-      `=IFERROR(INDEX(${MRI}!$AA$8:$AA$2007,${matchFormula}),"")`,
-      `=IFERROR(INDEX(${MRI}!$T$8:$T$2007,${matchFormula}),"")`,
+      `=IFERROR(INDEX(${MRI}!$AE$8:$AE$2007,${matchFormula}),"")`,
+      `=IFERROR(INDEX(${MRI}!$M$8:$M$2007,${matchFormula}),"")`,
     ]] });
   }
 
@@ -382,9 +382,9 @@ const CUISINES     = ['American','Italian','Mexican','Mediterranean','Greek','Fr
     });
   };
 
-  writeCountTable(0, 1, 28, 'MEAL TYPE', MEAL_TYPES, 'C');
-  writeCountTable(3, 4, 28, 'DIFFICULTY', DIFFICULTIES, 'M');
-  writeCountTable(6, 7, 28, 'CUISINE', CUISINES, 'E');
+  writeCountTable(0, 1, 28, 'MEAL TYPE', MEAL_TYPES, 'E');
+  writeCountTable(3, 4, 28, 'DIFFICULTY', DIFFICULTIES, 'L');
+  writeCountTable(6, 7, 28, 'CUISINE', CUISINES, 'F');
 
   // ── Column Widths ─────────────────────────────────────────────────────────
   const widths = [80, 160, 100, 90, 90, 20, 75, 185, 90, 60, 20, 20, 20, 20, 185, 70, 110, 40, 40, 40];

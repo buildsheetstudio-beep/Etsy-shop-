@@ -600,7 +600,7 @@ const INGREDIENTS = [
   // Stats row
   const STAT_LABELS = [
     ['Total Ingredients', `=COUNTA($D$8:$D$12007)`],
-    ['Recipes with Ingredients', `=COUNTIF($B$8:$B$12007,"REC-*")`],
+    ['Recipes with Ingredients', `=SUMPRODUCT((LEN($B$8:$B$12007)>0)*(1/COUNTIF($B$8:$B$12007,$B$8:$B$12007)))`],
   ];
   STAT_LABELS.forEach(([lbl, frm], i) => {
     const col = i * 2;

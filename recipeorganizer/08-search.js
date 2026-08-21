@@ -11,14 +11,14 @@ const MRI = "'Master Recipe Index'";
 // C5=MealType  C6=Category  C7=Cuisine  C8=Difficulty
 // C9=MaxTime   C10=Dietary  C11=FavOnly  C12=MinRating
 const CONDITIONS = [
-  `((LEN($C$5)=0)+(${MRI}!$C$8:$C$2007=$C$5))`,   // Meal Type (col C)
-  `((LEN($C$6)=0)+(${MRI}!$D$8:$D$2007=$C$6))`,   // Category (col D)
-  `((LEN($C$7)=0)+(${MRI}!$E$8:$E$2007=$C$7))`,   // Cuisine (col E)
-  `((LEN($C$8)=0)+(${MRI}!$M$8:$M$2007=$C$8))`,   // Difficulty (col M)
+  `((LEN($C$5)=0)+(${MRI}!$E$8:$E$2007=$C$5))`,   // Meal Type (col E)
+  `((LEN($C$6)=0)+(${MRI}!$C$8:$C$2007=$C$6))`,   // Category (col C)
+  `((LEN($C$7)=0)+(${MRI}!$F$8:$F$2007=$C$7))`,   // Cuisine (col F)
+  `((LEN($C$8)=0)+(${MRI}!$L$8:$L$2007=$C$8))`,   // Difficulty (col L)
   `(($C$9="")+(($C$9<>"")*1)*(${MRI}!$K$8:$K$2007<=$C$9))`, // Max Total Time (col K)
-  `((LEN($C$10)=0)+(${MRI}!$F$8:$F$2007=$C$10))`, // Dietary Tag (col F)
+  `((LEN($C$10)=0)+(${MRI}!$S$8:$S$2007=$C$10))`, // Dietary Tag (col S)
   `((NOT($C$11))+(($C$11)*(${MRI}!$O$8:$O$2007=TRUE)))`, // Favorites Only (col O)
-  `(($C$12="")+(($C$12<>"")*1)*(${MRI}!$T$8:$T$2007>=$C$12))`, // Min Rating (col T)
+  `(($C$12="")+(($C$12<>"")*1)*(${MRI}!$M$8:$M$2007>=$C$12))`, // Min Rating (col M)
   `(${MRI}!$B$8:$B$2007<>"")`, // non-blank recipe
 ];
 const COND_STR = CONDITIONS.join(' * \n  ');
@@ -32,7 +32,7 @@ const RESULTS_START = 19; // 0-indexed (GS row 20)
 // Count formula using SUMPRODUCT
 const countConds = CONDITIONS.map(c => `(${c}>=1)`).join(' * ');
 const countFormula = `=IFERROR(SUMPRODUCT(${countConds}),0)`;
-const avgRatingFormula = `=IFERROR(AVERAGEIFS(${MRI}!$T$8:$T$2007,${MRI}!$B$8:$B$2007,"<>",${MRI}!$T$8:$T$2007,">=1"),"")`; // simplified
+const avgRatingFormula = `=IFERROR(AVERAGEIFS(${MRI}!$M$8:$M$2007,${MRI}!$B$8:$B$2007,"<>",${MRI}!$M$8:$M$2007,">=1"),"")`; // simplified
 const avgTimeFormula   = `=IFERROR(AVERAGEIF(${MRI}!$B$8:$B$2007,"<>",${MRI}!$K$8:$K$2007),"")`;
 
 // Quick Search Presets (shown as reference - user reads and enters values manually)
@@ -323,7 +323,7 @@ const PRESETS = [
   }
 
   // Filtered result formulas column by column
-  const resultCols = ['A', 'B', 'C', 'D', 'E', 'M', 'K', 'F', 'O', 'T', 'N'];
+  const resultCols = ['A', 'B', 'E', 'C', 'F', 'L', 'K', 'S', 'O', 'M', 'AF'];
   resultCols.forEach((mriCol, ci) => {
     const formulas = Array.from({length: RESULT_ROWS}, (_, i) => {
       const N = i + 1;

@@ -185,24 +185,24 @@ const vl = (colIdx) =>
   };
 
   // Row 5 (idx 4): Meal Type | Category | Cuisine | Difficulty | Method
-  mLabel(4, 0, 'MEAL TYPE');  mVal(4, 1, 3, vl(3));
-  mLabel(4, 3, 'CATEGORY');   mVal(4, 4, 6, vl(4));
-  mLabel(4, 6, 'CUISINE');    mVal(4, 7, 9, vl(5));
-  mLabel(4, 9, 'DIFFICULTY'); mVal(4, 10, 12, vl(13));
-  mLabel(4, 12, 'METHOD');    mVal(4, 13, 15, vl(12));
+  mLabel(4, 0, 'MEAL TYPE');  mVal(4, 1, 3, vl(5));   // E=MealType
+  mLabel(4, 3, 'CATEGORY');   mVal(4, 4, 6, vl(3));   // C=PrimaryCategory
+  mLabel(4, 6, 'CUISINE');    mVal(4, 7, 9, vl(6));   // F=Cuisine
+  mLabel(4, 9, 'DIFFICULTY'); mVal(4, 10, 12, vl(12)); // L=Difficulty
+  mLabel(4, 12, 'METHOD');    mVal(4, 13, 15, vl(7));  // G=CookingMethod
 
   // Row 6 (idx 5): Prep | Cook | Total Time | Status | Rating
   mLabel(5, 0, 'PREP (min)');    mVal(5, 1, 3, vl(9));
   mLabel(5, 3, 'COOK (min)');    mVal(5, 4, 6, vl(10));
   mLabel(5, 6, 'TOTAL (min)');   mVal(5, 7, 9, vl(11));
-  mLabel(5, 9, 'STATUS');        mVal(5, 10, 12, vl(14));
-  mLabel(5, 12, 'RATING ★');     mVal(5, 13, 15, vl(20));
+  mLabel(5, 9, 'STATUS');        mVal(5, 10, 12, vl(32)); // AF=RecipeStatus
+  mLabel(5, 12, 'RATING ★');     mVal(5, 13, 15, vl(13)); // M=PersonalRating
 
   // ── Row 7: Dietary, Allergens, Serving Note ───────────────────────────────
   mLabel(6, 0, 'DIETARY');
-  mVal(6, 1, 5, vl(6));
+  mVal(6, 1, 5, vl(19));   // S=DietaryTag1
   mLabel(6, 5, 'ALLERGENS');
-  mVal(6, 6, 10, vl(7));
+  mVal(6, 6, 10, vl(22));  // V=AllergenTag1
 
   // Serving note K7:T7
   reqs.push({ mergeCells: { range: gridRange(SID, 6, 7, 10, 20), mergeType: 'MERGE_ALL' } });
@@ -230,7 +230,7 @@ const vl = (colIdx) =>
     } },
     fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment,wrapStrategy)',
   } });
-  vals.push({ range: `${S}!B8`, values: [[vl(31)]] }); // Description = col AE = index 31
+  vals.push({ range: `${S}!B8`, values: [[vl(34)]] }); // AH=GeneralNotes
 
   // ── Row 9: Spacer/Divider ─────────────────────────────────────────────────
   reqs.push({ repeatCell: {
