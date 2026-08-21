@@ -600,7 +600,7 @@ const INGREDIENTS = [
   // Stats row
   const STAT_LABELS = [
     ['Total Ingredients', `=COUNTA($D$8:$D$12007)`],
-    ['Recipes with Ingredients', `=SUMPRODUCT((LEN($B$8:$B$12007)>0)*(1/COUNTIF($B$8:$B$12007,$B$8:$B$12007)))`],
+    ['Recipes with Ingredients', `=SUMPRODUCT(IFERROR((LEN($B$8:$B$12007)>0)*(1/COUNTIF($B$8:$B$12007,$B$8:$B$12007)),0))`],
   ];
   STAT_LABELS.forEach(([lbl, frm], i) => {
     const col = i * 2;
@@ -757,6 +757,7 @@ const INGREDIENTS = [
   } });
 
   await batchUpdate(id, reqs, 'ing-fmt');
+  await valuesBatchUpdate(id, vals, 'ing-vals');
   await valuesBatchUpdate(id, [{ range: `${S}!A8`, values: dataRows }], 'ing-data');
   console.log(`✓ Recipe Ingredients — ${INGREDIENTS.length} rows written`);
 })().catch(e => { console.error(e.message || e); process.exit(1); });

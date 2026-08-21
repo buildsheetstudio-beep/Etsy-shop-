@@ -315,6 +315,7 @@ const RECIPES = [
   } });
 
   await batchUpdate(id, reqs, 'mri-fmt');
+  await valuesBatchUpdate(id, vals, 'mri-vals');
   await valuesBatchUpdate(id, [{ range: `${S}!A8`, values: dataRows }], 'mri-data');
   console.log('✓ Master Recipe Index — 60 recipes written');
 })().catch(e => { console.error(e.message || e); process.exit(1); });

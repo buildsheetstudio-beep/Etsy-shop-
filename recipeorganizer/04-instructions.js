@@ -484,7 +484,7 @@ const STEPS = [
     fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)',
   } });
   vals.push({ range: `${S}!A4`, values: [[`=COUNTA($F$8:$F$10007)`]] });
-  vals.push({ range: `${S}!B4`, values: [[`=SUMPRODUCT((LEN($B$8:$B$10007)>0)*(1/COUNTIF($B$8:$B$10007,$B$8:$B$10007)))`]] });
+  vals.push({ range: `${S}!B4`, values: [[`=SUMPRODUCT(IFERROR((LEN($B$8:$B$10007)>0)*(1/COUNTIF($B$8:$B$10007,$B$8:$B$10007)),0))`]] });
 
   [1,2,3,4,5,6].forEach(i => {
     reqs.push({ updateDimensionProperties: {
@@ -584,6 +584,7 @@ const STEPS = [
   });
 
   await batchUpdate(id, reqs, 'instr-fmt');
+  await valuesBatchUpdate(id, vals, 'instr-vals');
   await valuesBatchUpdate(id, [{ range: `${S}!A8`, values: dataRows }], 'instr-data');
   console.log(`✓ Recipe Instructions — ${STEPS.length} steps written`);
 })().catch(e => { console.error(e.message || e); process.exit(1); });
