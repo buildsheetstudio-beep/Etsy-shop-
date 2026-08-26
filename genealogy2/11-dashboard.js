@@ -345,7 +345,6 @@ async function main() {
     'Reasonable',`=COUNTIF(${MP}$Y$8:$Y$5107,"Reasonable")`,
     'Estimated / Speculative',
     `=COUNTIF(${MP}$Y$8:$Y$5107,"Estimated")+COUNTIF(${MP}$Y$8:$Y$5107,"Speculative")`,
-    '',''
   ]] });
 
   // ── Key Ancestors: Family Tree Overview (rows 30-40) ─────────────────────────

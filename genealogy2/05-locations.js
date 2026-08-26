@@ -163,8 +163,8 @@ const LOCS = [
 
   // Tab setup
   reqs.push({ updateSheetProperties: {
-    properties: { sheetId: SID, tabColor: hex(C.aqua), gridProperties: { frozenRowCount: 7, frozenColumnCount: 3 } },
-    fields: 'tabColor,gridProperties.frozenRowCount,gridProperties.frozenColumnCount',
+    properties: { sheetId: SID, tabColor: hex(C.aqua), gridProperties: { frozenRowCount: 7 } },
+    fields: 'tabColor,gridProperties.frozenRowCount',
   }});
 
   const deepAqua = '#4A8A88';

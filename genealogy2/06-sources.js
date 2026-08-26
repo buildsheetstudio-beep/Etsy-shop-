@@ -93,8 +93,8 @@ const SOURCES = [
 
   // Tab setup
   reqs.push({ updateSheetProperties: {
-    properties: { sheetId: SID, tabColor: hex(C.wheat), gridProperties: { frozenRowCount: 7, frozenColumnCount: 2 } },
-    fields: 'tabColor,gridProperties.frozenRowCount,gridProperties.frozenColumnCount',
+    properties: { sheetId: SID, tabColor: hex(C.wheat), gridProperties: { frozenRowCount: 7 } },
+    fields: 'tabColor,gridProperties.frozenRowCount',
   }});
 
   // Row 1 — Title

@@ -136,8 +136,8 @@ const VITALS = [
 
   // Tab setup
   reqs.push({ updateSheetProperties: {
-    properties: { sheetId: SID, tabColor: hex(C.lavender), gridProperties: { frozenRowCount: 7, frozenColumnCount: 3 } },
-    fields: 'tabColor,gridProperties.frozenRowCount,gridProperties.frozenColumnCount',
+    properties: { sheetId: SID, tabColor: hex(C.lavender), gridProperties: { frozenRowCount: 7 } },
+    fields: 'tabColor,gridProperties.frozenRowCount',
   }});
 
   // Row 1 — Title

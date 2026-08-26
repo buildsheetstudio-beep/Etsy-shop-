@@ -180,8 +180,8 @@ const PEOPLE = [
 
   // Tab setup
   reqs.push({ updateSheetProperties: {
-    properties: { sheetId: SID, tabColor: hex(C.primary), gridProperties: { frozenRowCount: 7, frozenColumnCount: 3 } },
-    fields: 'tabColor,gridProperties.frozenRowCount,gridProperties.frozenColumnCount',
+    properties: { sheetId: SID, tabColor: hex(C.primary), gridProperties: { frozenRowCount: 7, columnCount: 31 } },
+    fields: 'tabColor,gridProperties.frozenRowCount,gridProperties.columnCount',
   }});
 
   // Row 1 — Title

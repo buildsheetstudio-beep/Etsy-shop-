@@ -13,9 +13,9 @@ async function main() {
         sheetId: SID,
         tabColor: hex(C.info),
         tabColorStyle: { rgbColor: hex(C.info) },
-        gridProperties: { frozenRowCount: 10 },
+        gridProperties: { frozenRowCount: 10, rowCount: 1100 },
       },
-      fields: 'tabColor,tabColorStyle,gridProperties.frozenRowCount',
+      fields: 'tabColor,tabColorStyle,gridProperties.frozenRowCount,gridProperties.rowCount',
     },
   });
 

@@ -211,8 +211,8 @@ const RELS = [
 
   // Tab setup
   reqs.push({ updateSheetProperties: {
-    properties: { sheetId: SID, tabColor: hex(C.blush), gridProperties: { frozenRowCount: 7, frozenColumnCount: 3 } },
-    fields: 'tabColor,gridProperties.frozenRowCount,gridProperties.frozenColumnCount',
+    properties: { sheetId: SID, tabColor: hex(C.blush), gridProperties: { frozenRowCount: 7 } },
+    fields: 'tabColor,gridProperties.frozenRowCount',
   }});
 
   // Row 1 — Title (A1:M1)
