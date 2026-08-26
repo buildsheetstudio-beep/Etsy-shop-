@@ -119,14 +119,81 @@ const GEN1 = [
     died:'Living',                              occ:'School Teacher  •  P-00003' },
 ];
 
-const GEN0 = {
-  pid:'P-00001',
-  line1:"EMMA ROSE HARTWELL",
-  line2:"Root Person  •  Hartwell & O'Brien Family Tree  •  Five Generations Researched",
-  line3:"b. March 14, 1988  •  Boston, Massachusetts",
-  line4:"Living",
-  line5:"P-00001",
-};
+const GEN0 = { pid: 'P-00001' };
+
+// ── Formula helpers: look up data live from Master People ────────────────────
+const _MP = `'Master People'`;
+const _R  = `$8:$5107`;
+function _col(c)        { return `${_MP}!$${c}${_R}`; }
+function _m(pid)        { return `MATCH("${pid}",${_col('A')},0)`; }
+function _get(pid, c)   { return `IFERROR(INDEX(${_col(c)},${_m(pid)}),"")`;  }
+// Format a date cell to "mmm d, yyyy"; fall back to raw text for estimates
+function _dtFmt(pid, c) {
+  const raw = _get(pid, c);
+  return `IFERROR(TEXT(DATEVALUE(${raw}),"mmm d, yyyy"),${raw})`;
+}
+// Year only for tiny boxes; fall back to raw
+function _yrFmt(pid, c) {
+  const raw = _get(pid, c);
+  return `IFERROR(TEXT(DATEVALUE(${raw}),"yyyy"),${raw})`;
+}
+// "b. Date • Place"  or ""
+function _bLine(pid) {
+  const dt = _dtFmt(pid,'L'), pl = _get(pid,'N');
+  return `IF(${dt}<>"","b. "&${dt}&IF(${pl}<>""," • "&${pl},""),"")`;
+}
+// "d. Date • Place"  or ""
+function _dLine(pid) {
+  const dt = _dtFmt(pid,'O'), pl = _get(pid,'Q');
+  return `IF(${dt}<>"","d. "&${dt}&IF(${pl}<>""," • "&${pl},""),"")`;
+}
+// "Living" or "d. Date • Place"
+function _ldLine(pid) {
+  const status = _get(pid,'K'), dt = _dtFmt(pid,'O'), pl = _get(pid,'Q');
+  return `IF(${status}="Living","Living",IF(${dt}<>"","d. "&${dt}&IF(${pl}<>""," • "&${pl},""),""))`;
+}
+// Concatenate formula parts with CHAR(10) newlines (wrap-strategy renders them)
+function _fml(...parts) { return '=' + parts.filter(p => p).join('&CHAR(10)&'); }
+
+// ── Per-generation content builders ──────────────────────────────────────────
+// Gen4: tiny box — name, birth year, death year, PID
+function buildG4(p) {
+  if (!p.pid) return `${p.name}\n${p.born}\n${p.died}`;
+  const { pid } = p;
+  const by = _yrFmt(pid,'L'), dy = _yrFmt(pid,'O');
+  return _fml(
+    _get(pid,'B'),
+    `IF(${by}<>"","b. "&${by},"")`,
+    `IF(${dy}<>"","d. "&${dy},"")`,
+    `"${pid}"`
+  );
+}
+// Gen3: name, birth+place, death+place, PID
+function buildG3(p) {
+  const { pid } = p;
+  return _fml(_get(pid,'B'), _bLine(pid), _dLine(pid), `"${pid}"`);
+}
+// Gen2: name, birth+place, death+place, occupation, PID
+function buildG2(p) {
+  const { pid } = p;
+  return _fml(_get(pid,'B'), _bLine(pid), _dLine(pid), _get(pid,'S'), `"${pid}"`);
+}
+// Gen1: name, birth+place, living/death, occupation, PID
+function buildG1(p) {
+  const { pid } = p;
+  return _fml(_get(pid,'B'), _bLine(pid), _ldLine(pid), _get(pid,'S'), `"${pid}"`);
+}
+// Gen0 root: name, tagline, birth+place, status, PID
+function buildG0(p) {
+  const { pid } = p;
+  return _fml(
+    _get(pid,'B'),
+    `"Root Person  •  Hartwell & O'Brien Family Tree  •  Five Generations Researched"`,
+    _bLine(pid),
+    _get(pid,'K'),
+    `"${pid}"`
+  );
+}
 
 // ── Helper: connector cells ───────────────────────────────────────────────────
 // For a connector row at rowIdx, color specific cells to draw tree branch lines
@@ -266,36 +333,26 @@ async function main() {
     const c1 = i * 2;
     const isUnk = !p.pid;
     const bg = isUnk ? C.neutral : BOX_BG[0];
-    const content = `${p.name}\n${p.born}\n${p.died}${p.pid ? '\n'+p.pid : ''}`;
-    personBox(G4_BOX_R1, G4_BOX_R2, c1, c1+2, bg, isUnk ? C.secText : BOX_FG[0], 7, !isUnk, content);
+    personBox(G4_BOX_R1, G4_BOX_R2, c1, c1+2, bg, isUnk ? C.secText : BOX_FG[0], 7, !isUnk, buildG4(p));
   });
 
   // ── GEN3: 8 boxes × 4 cols each ──────────────────────────────────────────────
   GEN3.forEach((p, i) => {
-    const c1 = i * 4;
-    const content = `${p.name}\n${p.born}\n${p.died}\n${p.pid}`;
-    personBox(G3_BOX_R1, G3_BOX_R2, c1, c1+4, BOX_BG[1], BOX_FG[1], 8, true, content);
+    personBox(G3_BOX_R1, G3_BOX_R2, i*4, i*4+4, BOX_BG[1], BOX_FG[1], 8, true, buildG3(p));
   });
 
   // ── GEN2: 4 boxes × 8 cols each ──────────────────────────────────────────────
   GEN2.forEach((p, i) => {
-    const c1 = i * 8;
-    const content = `${p.name}\n${p.born}\n${p.died}\n${p.pid}`;
-    personBox(G2_BOX_R1, G2_BOX_R2, c1, c1+8, BOX_BG[2], BOX_FG[2], 9, true, content);
+    personBox(G2_BOX_R1, G2_BOX_R2, i*8, i*8+8, BOX_BG[2], BOX_FG[2], 9, true, buildG2(p));
   });
 
   // ── GEN1: 2 boxes × 16 cols each ─────────────────────────────────────────────
   GEN1.forEach((p, i) => {
-    const c1 = i * 16;
-    const content = `${p.name}\n${p.born}\n${p.marr}\n${p.died}\n${p.occ}`;
-    personBox(G1_BOX_R1, G1_BOX_R2, c1, c1+16, BOX_BG[3], BOX_FG[3], 10, true, content);
+    personBox(G1_BOX_R1, G1_BOX_R2, i*16, i*16+16, BOX_BG[3], BOX_FG[3], 10, true, buildG1(p));
   });
 
   // ── GEN0: Emma — full width ───────────────────────────────────────────────────
-  const g0content = [
-    GEN0.line1, GEN0.line2, GEN0.line3, GEN0.line4, GEN0.line5
-  ].join('\n');
-  personBox(G0_BOX_R1, G0_BOX_R2, 0, NCOLS, BOX_BG[4], BOX_FG[4], 13, true, g0content);
+  personBox(G0_BOX_R1, G0_BOX_R2, 0, NCOLS, BOX_BG[4], BOX_FG[4], 13, true, buildG0(GEN0));
 
   // ── Connector rows ────────────────────────────────────────────────────────────
   // Gen4→Gen3: 8 groups of 4 cols, center cells = [4k+1, 4k+2]
