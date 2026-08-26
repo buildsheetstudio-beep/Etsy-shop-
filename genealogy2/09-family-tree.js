@@ -4,328 +4,318 @@ const { id, sheetMap } = JSON.parse(require('fs').readFileSync(__dirname + '/spr
 const SID = sheetMap['Family Tree'];
 const S   = 'Family Tree';
 
-const BPR  = 4;          // boxes per row
-const BCOL = 3;          // columns per box
-const BROW = 3;          // rows per box
-const TCOL = BPR * BCOL; // 12
+// ── Layout constants ─────────────────────────────────────────────────────────
+// 32 columns (A-AF) × 55px = 1760px total
+// Gen4 = 16 boxes × 2 cols each
+// Gen3 = 8 boxes × 4 cols each
+// Gen2 = 4 boxes × 8 cols each
+// Gen1 = 2 boxes × 16 cols each
+// Gen0 = 1 box × 32 cols
+const NCOLS = 32;
+const CW    = 55;
 
-// [pid, displayName, bornLine, diedLine, branch]
-const SECTIONS = [
-  {
-    title: '4× GREAT-GRANDPARENTS',
-    sub: 'c. 1775–1815  •  Earliest confirmed ancestors',
-    hBg: C.primaryDeep, hFg: C.white,
-    people: [
-      ['P-00061', 'Thaddeus O\'Brien',           'b. c.1775 • Co. Cork, Ireland',     'd. c.1840',                     "O'Brien"],
-      ['P-00062', 'Catherine McCarthy O\'Brien', 'b. c.1778 • Co. Cork, Ireland',     'd. c.1842',                     "O'Brien"],
-      ['P-00063', 'Thomas Hartwell',             'b. c.1780 • Warwickshire, England', 'd. c.1850',                     'Hartwell'],
-      ['P-00064', 'Jane Booth Hartwell',         'b. c.1785 • Warwickshire, England', 'd. c.1855',                     'Hartwell'],
-      ['P-00084', 'Hannah Turner',               'b. c.1790 • Warwickshire, England', 'd. c.1860',                     'Hartwell'],
-      ['P-00085', 'John Turner',                 'b. c.1785 • Warwickshire, England', 'd. c.1855',                     'Hartwell'],
-      ['P-00091', 'Alice Booth',                 'b. c.1810 • Warwickshire, England', 'd. c.1878',                     'Hartwell'],
-    ],
-  },
-  {
-    title: '3× GREAT-GRANDPARENTS',
-    sub: 'c. 1808–1860',
-    hBg: '#5C7F9F', hFg: C.white,
-    people: [
-      ['P-00047', 'Frederick G. Hartwell',       'b. c.1815 • Warwickshire, England', 'd. c.1880 • Coventry, England', 'Hartwell'],
-      ['P-00048', 'Ann Turner Hartwell',         'b. c.1820 • Warwickshire, England', 'd. c.1885 • Coventry, England', 'Hartwell'],
-      ['P-00065', 'Francis M. Holt',             'b. c.1820 • Coventry, England',     'd. c.1890',                     'Hartwell'],
-      ['P-00067', 'Alice V. Holt Fletcher',      'b. c.1825 • Birmingham, England',   'd. c.1895',                     'Hartwell'],
-      ['P-00090', 'Albert F. Holt',              'b. c.1855 • Coventry, England',     'd. c.1920',                     'Hartwell'],
-      ['P-00102', 'Cecil E. Hartwell',           'b. c.1854 • Coventry, England',     'd. c.1932',                     'Hartwell'],
-      ['P-00049', 'Jeremiah O\'Brien',           'b. c.1808 • Co. Cork, Ireland',     'd. 1855 • Co. Cork, Ireland',   "O'Brien"],
-      ['P-00050', 'Mary Driscoll O\'Brien',      'b. c.1812 • Co. Cork, Ireland',     'd. 1848 • Co. Cork, Ireland',   "O'Brien"],
-      ['P-00059', '[Unknown] Crowley',           'b. Unknown • Co. Cork, Ireland',    'Deceased — records lost',       "O'Brien"],
-      ['P-00066', 'Nora O\'Connell Crowley',     'b. c.1825 • Co. Cork, Ireland',     'd. c.1890',                     "O'Brien"],
-    ],
-  },
-  {
-    title: '2× GREAT-GRANDPARENTS',
-    sub: 'c. 1845–1875',
-    hBg: C.primary, hFg: C.white,
-    people: [
-      ['P-00016', 'George T. Hartwell',          'b. c.1850 • Coventry, England',     'd. c.1920 • Coventry, England', 'Hartwell'],
-      ['P-00017', 'Martha Holt Hartwell',        'b. c.1854 • Coventry, England',     'd. c.1925 • Coventry, England', 'Hartwell'],
-      ['P-00018', 'Edward J. Fletcher',          'b. c.1858 • Birmingham, England',   'd. c.1930 • Coventry, England', 'Hartwell'],
-      ['P-00019', 'Sarah Pickles Fletcher',      'b. c.1862 • Birmingham, England',   'd. c.1935 • Coventry, England', 'Hartwell'],
-      ['P-00043', 'Henry W. Fletcher',           'b. c.1860 • Birmingham, England',   'd. c.1928 • Coventry, England', 'Hartwell'],
-      ['P-00020', 'Cornelius O\'Brien',          'b. c.1845 • Co. Cork, Ireland',     'd. 1895 • Co. Cork, Ireland',   "O'Brien"],
-      ['P-00021', 'Honora Crowley O\'Brien',     'b. c.1848 • Co. Cork, Ireland',     'd. 1900 • Co. Cork, Ireland',   "O'Brien"],
-      ['P-00022', 'Daniel Shaughnessy',          'b. c.1850 • Co. Cork, Ireland',     'd. 1908 • Co. Cork, Ireland',   "O'Brien"],
-      ['P-00023', 'Ellen Sullivan Shaughnessy',  'b. c.1852 • Co. Cork, Ireland',     'd. 1910 • Co. Cork, Ireland',   "O'Brien"],
-      ['P-00024', 'Patrick Murphy',              'b. c.1852 • Co. Clare, Ireland',    'd. 1910 • Co. Clare, Ireland',  "O'Brien"],
-      ['P-00025', 'Bridget Ryan Murphy',         'b. c.1855 • Co. Clare, Ireland',    'd. 1912 • Co. Clare, Ireland',  "O'Brien"],
-      ['P-00041', 'John M. Gallagher',           'b. c.1855 • Co. Clare, Ireland',    'd. c.1920 • Co. Clare, Ireland',"O'Brien"],
-      ['P-00042', 'Anne Connelly Gallagher',     'b. c.1858 • Co. Clare, Ireland',    'd. c.1925 • Co. Clare, Ireland',"O'Brien"],
-    ],
-  },
-  {
-    title: 'GREAT-GRANDPARENTS',
-    sub: 'c. 1880–1900',
-    hBg: C.secondary, hFg: C.text,
-    people: [
-      ['P-00008', 'William H. Hartwell',         'b. 1888 • Coventry, England',       'd. 1952 • Springfield, MA',     'Hartwell'],
-      ['P-00009', 'Agnes Fletcher Hartwell',     'b. 1892 • Coventry, England',       'd. 1960 • Springfield, MA',     'Hartwell'],
-      ['P-00010', 'Charles F. Chapman',          'b. c.1895 • Hartford, CT',          'd. 1958 • Springfield, MA',     'Hartwell'],
-      ['P-00011', 'Harriet Davies Chapman',      'b. 1898 • Hartford, CT',            'd. 1971 • Springfield, MA',     'Hartwell'],
-      ['P-00039', 'Arthur R. Chapman',           'b. c.1898 • Hartford, CT',          'd. 1962 • Springfield, MA',     'Hartwell'],
-      ['P-00012', 'Michael P. O\'Brien',         'b. c.1882 • Co. Cork, Ireland',     'd. 1944 • Providence, RI',      "O'Brien"],
-      ['P-00013', 'Brigid Shaughnessy O\'Brien', 'b. c.1886 • Co. Cork, Ireland',     'd. 1949 • Providence, RI',      "O'Brien"],
-      ['P-00014', 'Thomas F. Murphy',            'b. c.1886 • Co. Clare, Ireland',    'd. 1938 • Providence, RI',      "O'Brien"],
-      ['P-00015', 'Mary Gallagher Murphy',       'b. c.1889 • Co. Clare, Ireland',    'd. 1955 • Providence, RI',      "O'Brien"],
-    ],
-  },
-  {
-    title: 'GRANDPARENTS',
-    sub: 'c. 1920–1928',
-    hBg: C.aqua, hFg: C.text,
-    people: [
-      ['P-00004', 'Robert C. Hartwell Sr.',      'b. 1922 • Springfield, MA',         'd. 1995 • Worcester, MA',       'Hartwell'],
-      ['P-00005', 'Eleanor Chapman Hartwell',    'b. 1926 • Springfield, MA',         'd. 2003 • Worcester, MA',       'Hartwell'],
-      ['P-00006', 'Patrick J. O\'Brien',         'b. 1920 • Providence, RI',          'd. 1998 • Providence, RI',      "O'Brien"],
-      ['P-00007', 'Catherine Murphy O\'Brien',   'b. 1924 • Providence, RI',          'd. 2007 • Providence, RI',      "O'Brien"],
-    ],
-  },
-  {
-    title: 'PARENTS',
-    sub: 'c. 1955–1958',
-    hBg: C.lavender, hFg: C.text,
-    people: [
-      ['P-00002', 'James Edward Hartwell',       'b. 1955 • Worcester, MA',           'd. 2019 • Boston, MA',          'Hartwell'],
-      ['P-00003', 'Margaret O\'Brien Hartwell',  'b. 1958 • Providence, RI',          'Living',                        "O'Brien"],
-    ],
-  },
-  {
-    title: 'ROOT GENERATION — Emma & Siblings',
-    sub: 'c. 1975–1993',
-    hBg: C.secondaryDeep, hFg: C.white,
-    people: [
-      ['P-00001', '★ EMMA ROSE HARTWELL',        'b. 1988-03-14 • Boston, MA',        'Living  (Root Person)',          'root'],
-      ['P-00026', 'Thomas James Hartwell',       'b. 1983 • Worcester, MA',           'Living',                        'Hartwell'],
-      ['P-00027', 'Sarah Hartwell Novak',        'b. 1990 • Worcester, MA',           'Living',                        'Hartwell'],
-      ['P-00038', 'Helen Hartwell (adopted)',    'b. c.1993',                         'Living',                        'Hartwell'],
-      ['P-00045', 'Daniel Paul Hartwell',        'b. 1975 • Hartford, CT',            'Living  (half-brother)',         'Hartwell'],
-    ],
-  },
-  {
-    title: 'DESCENDANTS',
-    sub: 'c. 1978–2015',
-    hBg: C.wheat, hFg: C.text,
-    people: [
-      ['P-00034', 'Kevin Richard Hartwell',      'b. 1978 • Worcester, MA',           'Living',                        'Hartwell'],
-      ['P-00035', 'Jennifer Hartwell Walsh',     'b. 1980 • Worcester, MA',           'Living',                        'Hartwell'],
-      ['P-00057', 'Sean Michael O\'Brien Jr.',   'b. 1980 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00092', 'Declan Patrick O\'Brien',     'b. 1982 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00055', 'Fiona O\'Brien Donovan',      'b. 1983 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00056', 'Connor Patrick Donovan',      'b. 1985 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00029', 'Oliver James Hartwell',       'b. 2012 • Chicago, IL',             'Living',                        'Hartwell'],
-      ['P-00030', 'Sophia Grace Hartwell',       'b. 2015 • Chicago, IL',             'Living',                        'Hartwell'],
-      ['P-00094', 'Liam Connor O\'Brien',        'b. 2010 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00095', 'Siobhan Grace O\'Brien',      'b. 2013 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00098', 'Patrick Martin O\'Brien',     'b. 1912 • Providence, RI',          'd. 1985 • Providence, RI',      "O'Brien"],
-      ['P-00099', 'Evelyn McCarthy O\'Brien',    'b. 1915 • Providence, RI',          'd. 1992 • Providence, RI',      "O'Brien"],
-    ],
-  },
-  {
-    title: 'SPOUSES & PARTNERS',
-    sub: 'Married-in and partnered family members',
-    hBg: C.blush, hFg: C.text,
-    people: [
-      ['P-00028', 'Linda Patel Hartwell',        'b. 1985 • Chicago, IL',             'Living  (Thomas\'s spouse)',     'Hartwell'],
-      ['P-00031', 'Peter Novak',                 'b. 1988 • Boston, MA',              'Living  (Sarah\'s husband)',     'Hartwell'],
-      ['P-00058', 'Nicole Rossi O\'Brien',       'b. 1982 • Providence, RI',          'Living  (Sean Jr.\'s wife)',     "O'Brien"],
-      ['P-00093', 'Aisling Murphy O\'Brien',     'b. 1984 • Providence, RI',          'Living  (Declan\'s wife)',       "O'Brien"],
-    ],
-  },
-  {
-    title: 'EXTENDED FAMILY & OTHER RELATIVES',
-    sub: 'Collateral branches, in-laws, and associated individuals',
-    hBg: C.neutral, hFg: C.text,
-    people: [
-      ['P-00032', 'Richard A. Hartwell',         'b. 1952 • Worcester, MA',           'd. 2020 • Worcester, MA',       'Hartwell'],
-      ['P-00033', 'Dorothy Simmons Hartwell',    'b. 1954 • Worcester, MA',           'Living',                        'Hartwell'],
-      ['P-00036', 'Sean Patrick O\'Brien',       'b. 1956 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00037', 'Colleen O\'Brien Donovan',    'b. 1960 • Providence, RI',          'd. 2015 • Providence, RI',      "O'Brien"],
-      ['P-00040', 'Rose Kelly Chapman',          'b. c.1900 • Hartford, CT',          'd. 1978 • Springfield, MA',     'Hartwell'],
-      ['P-00044', 'Elizabeth A. Hartwell',       'b. 1918 • Springfield, MA',         'd. 1919  (infant)',             'Hartwell'],
-      ['P-00046', 'Carol Morrison',              'b. 1953 • Hartford, CT',            'Living  (James\'s 1st wife)',    'Hartwell'],
-      ['P-00051', 'Grace Walsh Hartwell',        'b. 1955 • Worcester, MA',           'Living',                        'Hartwell'],
-      ['P-00052', 'Brian Francis Walsh',         'b. 1950 • Worcester, MA',           'd. 2018 • Worcester, MA',       'Hartwell'],
-      ['P-00053', 'Maureen Donovan',             'b. 1958 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00054', 'Patrick Sean Donovan',        'b. 1957 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00060', 'James A. Flynn',              'b. c.1884 • Co. Cork, Ireland',     'd. c.1950 • Providence, RI',    "O'Brien"],
-      ['P-00068', 'Domenico Rossi',              'b. 1910 • Palermo, Sicily',         'd. 1978 • Providence, RI',      "O'Brien"],
-      ['P-00069', 'Rosa Marino Rossi',           'b. 1915 • Palermo, Sicily',         'd. 1990 • Providence, RI',      "O'Brien"],
-      ['P-00070', 'Bartholomew Chapman',         'b. c.1865 • Hartford, CT',          'd. c.1940 • Hartford, CT',      'Hartwell'],
-      ['P-00071', 'Joseph B. O\'Brien',          'b. 1905 • Providence, RI',          'd. 1945 • Normandy (KIA)',      "O'Brien"],
-      ['P-00072', 'Margaret Alice O\'Brien',     'b. 1910 • Providence, RI',          'Unknown — Brick Wall',          "O'Brien"],
-      ['P-00073', 'William J. O\'Brien',         'b. 1908 • Providence, RI',          'd. 1980 • Providence, RI',      "O'Brien"],
-      ['P-00074', 'Kathleen O\'Brien Carey',     'b. 1912 • Providence, RI',          'd. 2005 • Providence, RI',      "O'Brien"],
-      ['P-00075', 'Robert F. Hartwell',          'b. 1924 • Springfield, MA',         'd. 1943 • Tarawa (KIA)',         'Hartwell'],
-      ['P-00076', 'Mildred Hartwell Perry',      'b. 1928 • Springfield, MA',         'd. 2010 • Springfield, MA',     'Hartwell'],
-      ['P-00077', 'Howard E. Perry',             'b. 1925 • Springfield, MA',         'd. 1998 • Springfield, MA',     'Hartwell'],
-      ['P-00078', 'Barbara Perry Morrison',      'b. 1952 • Springfield, MA',         'Living',                        'Hartwell'],
-      ['P-00079', 'Harold E. Perry',             'b. 1955 • Springfield, MA',         'Living',                        'Hartwell'],
-      ['P-00080', 'Timothy J. Murphy',           'b. 1918 • Providence, RI',          'd. 1988 • Providence, RI',      "O'Brien"],
-      ['P-00081', 'Frances Murphy Kelly',        'b. 1920 • Providence, RI',          'd. 2001 • Providence, RI',      "O'Brien"],
-      ['P-00082', 'Gerard T. Kelly',             'b. 1918 • Providence, RI',          'd. 1975 • Providence, RI',      "O'Brien"],
-      ['P-00083', 'Christopher West',            'b. 1960 • Boston, MA',              'Living  (Margaret\'s partner)', 'Hartwell'],
-      ['P-00086', 'Salvatore Marino',            'b. c.1885 • Palermo, Sicily',       'd. 1960 • Providence, RI',      "O'Brien"],
-      ['P-00087', 'Giuseppa Ferrara Marino',     'b. c.1890 • Palermo, Sicily',       'd. 1965 • Providence, RI',      "O'Brien"],
-      ['P-00088', 'Andrew J. Gallagher',         'b. c.1879 • Co. Clare, Ireland',    'Status Unknown',                "O'Brien"],
-      ['P-00089', 'Sarah [Unknown] Hartwell',    'b. Unknown',                        'Deceased — Brick Wall',         'Hartwell'],
-      ['P-00096', 'Martin J. O\'Brien',          'b. c.1880 • Co. Cork, Ireland',     'd. 1960 • Providence, RI',      "O'Brien"],
-      ['P-00097', 'Anastasia Shea O\'Brien',     'b. c.1883 • Providence, RI',        'd. 1968 • Providence, RI',      "O'Brien"],
-      ['P-00100', 'James P. O\'Brien',           'b. 1940 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00101', 'Dorothy Walsh O\'Brien',      'b. 1943 • Providence, RI',          'Living',                        "O'Brien"],
-      ['P-00103', 'Eleanor Parker',              'b. 1965 • Worcester, MA',           'Living',                        'Hartwell'],
-    ],
-  },
+// Row layout (0-indexed):
+// 0        Title (48px)
+// 1        Gen4 generation label (18px)
+// 2-4      Gen4 person boxes (3×20px)
+// 5        Connector row (8px)
+// 6        Gen3 label (18px)
+// 7-11     Gen3 person boxes (5×22px)
+// 12       Connector row (8px)
+// 13       Gen2 label (18px)
+// 14-20    Gen2 person boxes (7×22px)
+// 21       Connector row (8px)
+// 22       Gen1 label (18px)
+// 23-33    Gen1 person boxes (11×24px)
+// 34       Connector row (8px)
+// 35       Gen0 label (18px)
+// 36-44    Gen0 root box (9×40px)
+
+const TITLE_ROW   = 0;
+const G4_LBL_ROW  = 1;
+const G4_BOX_R1   = 2;  const G4_BOX_R2  = 5;   // rows 2-4 (exclusive end 5)
+const G4_CONN_ROW = 5;
+const G3_LBL_ROW  = 6;
+const G3_BOX_R1   = 7;  const G3_BOX_R2  = 12;  // rows 7-11
+const G3_CONN_ROW = 12;
+const G2_LBL_ROW  = 13;
+const G2_BOX_R1   = 14; const G2_BOX_R2  = 21;  // rows 14-20
+const G2_CONN_ROW = 21;
+const G1_LBL_ROW  = 22;
+const G1_BOX_R1   = 23; const G1_BOX_R2  = 34;  // rows 23-33
+const G1_CONN_ROW = 34;
+const G0_LBL_ROW  = 35;
+const G0_BOX_R1   = 36; const G0_BOX_R2  = 45;  // rows 36-44
+
+// ── Colors ───────────────────────────────────────────────────────────────────
+const BOX_BG = [
+  C.primary,       // Gen4 — light steel blue
+  C.secondary,     // Gen3 — light sage
+  C.blush,         // Gen2 — light rose
+  C.wheat,         // Gen1 — light wheat
+  C.primaryDeep,   // Gen0 — Emma (prominent dark blue)
+];
+const BOX_FG = [C.white, C.text, C.text, C.text, C.white];
+const LBL_BG = [C.primaryDeep, '#5C7F9F', C.primary, C.secondary, C.primaryDeep];
+
+const CONN_COLOR = '#6A8FAF'; // C.primaryDeep — tree branch lines
+
+// ── People data ──────────────────────────────────────────────────────────────
+// Ordered left-to-right, matching pedigree position (paternal side left)
+
+// Each Gen4 box: 2 cols wide. 16 people across = 32 cols.
+// Pairs: [0-1],[2-3]→Gen3[0]; [4-5],[6-7]→Gen3[1]; etc.
+const GEN4 = [
+  // William Hartwell's parents (→ Robert → James → Emma, left branch)
+  { pid:'P-00016', name:'George A.\nHartwell',          born:'b. c.1860',  died:'d. 1938\nWorcester, MA' },
+  { pid:'P-00017', name:'Martha Holt\nHartwell',         born:'b. c.1862',  died:'d. 1940\nSpringfield, MA' },
+  // Agnes Fletcher's parents
+  { pid:'P-00018', name:'Edward J.\nFletcher',           born:'b. c.1865',  died:'d. c.1920\nCoventry, England' },
+  { pid:'P-00019', name:'Sarah Pickles\nFletcher',       born:'b. c.1868',  died:'d. c.1930\nBoston, MA' },
+  // Charles Chapman's parents (unknown)
+  { pid:'P-00070', name:'Bartholomew R.\nChapman',       born:'b. c.1858',  died:'d. c.1930\nHartford, CT' },
+  { pid:null,      name:'[Unknown]\nChapman',            born:'c. 1860',    died:'Unknown' },
+  // Harriet Davies' parents (unknown)
+  { pid:null,      name:'[Unknown]\nDavies',             born:'c. 1862',    died:'Unknown' },
+  { pid:null,      name:'[Unknown]\nDavies',             born:'c. 1865',    died:'Unknown' },
+  // Michael O'Brien's parents
+  { pid:'P-00020', name:"Cornelius P.\nO'Brien",         born:'b. c.1863',  died:'d. 1935\nCo. Cork, Ireland' },
+  { pid:'P-00021', name:"Honora Crowley\nO'Brien",       born:'b. c.1865',  died:'d. 1940\nCo. Cork, Ireland' },
+  // Brigid Shaughnessy's parents
+  { pid:'P-00022', name:'Daniel\nShaughnessy',           born:'b. c.1870',  died:'d. 1945\nCo. Cork, Ireland' },
+  { pid:'P-00023', name:'Ellen Sullivan\nShaughnessy',   born:'b. c.1872',  died:'d. 1948\nCo. Kerry, Ireland' },
+  // Thomas Murphy's parents
+  { pid:'P-00024', name:'Patrick M.\nMurphy',            born:'b. c.1870',  died:'d. 1945\nCo. Mayo, Ireland' },
+  { pid:'P-00025', name:'Bridget Ryan\nMurphy',          born:'b. c.1873',  died:'d. 1950\nCo. Roscommon' },
+  // Mary Gallagher's parents
+  { pid:'P-00041', name:'John M.\nGallagher',            born:'b. c.1872',  died:'d. 1948\nCo. Galway, Ireland' },
+  { pid:'P-00042', name:'Anne Connelly\nGallagher',      born:'b. c.1875',  died:'d. 1955\nCo. Galway, Ireland' },
 ];
 
-const BRANCH_BG = { 'Hartwell': C.info, "O'Brien": C.secondary, root: C.primaryDeep };
-const BRANCH_FG = { 'Hartwell': C.text, "O'Brien": C.text, root: C.white };
+const GEN3 = [
+  { pid:'P-00008', name:"William H.\nHartwell",         born:'b. 1888\nCoventry, England', died:'d. 1952\nSpringfield, MA' },
+  { pid:'P-00009', name:"Agnes Fletcher\nHartwell",     born:'b. 1892\nCoventry, England', died:'d. 1960\nSpringfield, MA' },
+  { pid:'P-00010', name:"Charles F.\nChapman",          born:'b. c.1895\nHartford, CT',    died:'d. 1958\nSpringfield, MA' },
+  { pid:'P-00011', name:"Harriet Davies\nChapman",      born:'b. 1898\nHartford, CT',      died:'d. 1971\nSpringfield, MA' },
+  { pid:'P-00012', name:"Michael P.\nO'Brien",          born:"b. c.1882\nCo. Cork, Ireland",died:'d. 1944\nProvidence, RI' },
+  { pid:'P-00013', name:"Brigid Shaughnessy\nO'Brien",  born:"b. c.1886\nCo. Cork, Ireland",died:'d. 1949\nProvidence, RI' },
+  { pid:'P-00014', name:"Thomas F.\nMurphy",            born:'b. c.1886\nCo. Clare, Ireland',died:'d. 1938\nProvidence, RI' },
+  { pid:'P-00015', name:"Mary Gallagher\nMurphy",       born:'b. c.1889\nCo. Clare, Ireland',died:'d. 1955\nProvidence, RI' },
+];
+
+const GEN2 = [
+  { pid:'P-00004', name:"Robert Charles Hartwell Sr.",   born:'b. 1922\nSpringfield, MA',   died:'d. 1995\nWorcester, MA' },
+  { pid:'P-00005', name:"Eleanor Chapman Hartwell",      born:'b. 1926\nSpringfield, MA',   died:'d. 2003\nWorcester, MA' },
+  { pid:'P-00006', name:"Patrick J. O'Brien",            born:'b. 1920\nProvidence, RI',    died:'d. 1998\nProvidence, RI' },
+  { pid:'P-00007', name:"Catherine Murphy O'Brien",      born:'b. 1924\nProvidence, RI',    died:'d. 2007\nProvidence, RI' },
+];
+
+const GEN1 = [
+  { pid:'P-00002', name:"James Edward Hartwell",
+    born:'b. June 22, 1955  •  Worcester, MA', marr:'m. 1981  •  Worcester, MA',
+    died:'d. Aug 5, 2019  •  Boston, MA',      occ:'Accountant  •  P-00002' },
+  { pid:'P-00003', name:"Margaret Anne O'Brien Hartwell",
+    born:'b. Nov 3, 1958  •  Providence, RI',  marr:'m. 1981  •  Worcester, MA',
+    died:'Living',                              occ:'School Teacher  •  P-00003' },
+];
+
+const GEN0 = {
+  pid:'P-00001',
+  line1:"EMMA ROSE HARTWELL",
+  line2:"Root Person  •  Hartwell & O'Brien Family Tree  •  Five Generations Researched",
+  line3:"b. March 14, 1988  •  Boston, Massachusetts",
+  line4:"Living",
+  line5:"P-00001",
+};
+
+// ── Helper: connector cells ───────────────────────────────────────────────────
+// For a connector row at rowIdx, color specific cells to draw tree branch lines
+// Each generation transition has a specific connector pattern:
+// Gen4→Gen3: 8 groups of 4 cols; center at [4k+1, 4k+2]
+// Gen3→Gen2: 4 groups of 8 cols; center at [8k+3, 8k+4]
+// Gen2→Gen1: 2 groups of 16 cols; center at [16k+7, 16k+8]
+// Gen1→Gen0: 1 group; center at [15, 16]
+function connectorCells(rowIdx, centers) {
+  const reqs = [];
+  // Background of the whole connector row = C.bg
+  reqs.push({ repeatCell: {
+    range: gridRange(SID, rowIdx, rowIdx+1, 0, NCOLS),
+    cell: { userEnteredFormat: { backgroundColor: hex(C.bg) } },
+    fields: 'userEnteredFormat.backgroundColor',
+  }});
+  // Color the connector cells
+  for (const [c1, c2] of centers) {
+    reqs.push({ repeatCell: {
+      range: gridRange(SID, rowIdx, rowIdx+1, c1, c2+1),
+      cell: { userEnteredFormat: { backgroundColor: hex(CONN_COLOR) } },
+      fields: 'userEnteredFormat.backgroundColor',
+    }});
+  }
+  return reqs;
+}
 
 async function main() {
   const reqs = [];
   const vals = [];
 
-  // Sheet properties
+  // ── Sheet properties ────────────────────────────────────────────────────────
   reqs.push({ updateSheetProperties: {
     properties: {
       sheetId: SID,
       tabColor: hex(C.secondaryDeep),
       tabColorStyle: { rgbColor: hex(C.secondaryDeep) },
-      gridProperties: { frozenRowCount: 2 },
+      gridProperties: { frozenRowCount: 1, columnCount: NCOLS },
     },
-    fields: 'tabColor,tabColorStyle,gridProperties.frozenRowCount',
+    fields: 'tabColor,tabColorStyle,gridProperties.frozenRowCount,gridProperties.columnCount',
   }});
 
   // Unmerge all from previous layout
-  reqs.push({ unmergeCells: { range: gridRange(SID, 0, 500, 0, 20) } });
+  reqs.push({ unmergeCells: { range: gridRange(SID, 0, 500, 0, 33) } });
 
-  // Column widths: 12 cols at 75px each
-  for (let i = 0; i < TCOL; i++) {
+  // Column widths
+  for (let i = 0; i < NCOLS; i++) {
     reqs.push({ updateDimensionProperties: {
       range: { sheetId: SID, dimension: 'COLUMNS', startIndex: i, endIndex: i+1 },
-      properties: { pixelSize: 75 }, fields: 'pixelSize',
+      properties: { pixelSize: CW }, fields: 'pixelSize',
     }});
   }
 
-  // Row 1: title
-  reqs.push({ mergeCells: { range: gridRange(SID,0,1,0,TCOL), mergeType:'MERGE_ALL' }});
+  // Row heights
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: TITLE_ROW, endIndex: TITLE_ROW+1 }, properties: { pixelSize: 48 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G4_LBL_ROW, endIndex: G4_LBL_ROW+1 }, properties: { pixelSize: 18 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G4_BOX_R1, endIndex: G4_BOX_R2 }, properties: { pixelSize: 20 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G4_CONN_ROW, endIndex: G4_CONN_ROW+1 }, properties: { pixelSize: 8 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G3_LBL_ROW, endIndex: G3_LBL_ROW+1 }, properties: { pixelSize: 18 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G3_BOX_R1, endIndex: G3_BOX_R2 }, properties: { pixelSize: 22 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G3_CONN_ROW, endIndex: G3_CONN_ROW+1 }, properties: { pixelSize: 8 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G2_LBL_ROW, endIndex: G2_LBL_ROW+1 }, properties: { pixelSize: 18 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G2_BOX_R1, endIndex: G2_BOX_R2 }, properties: { pixelSize: 22 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G2_CONN_ROW, endIndex: G2_CONN_ROW+1 }, properties: { pixelSize: 8 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G1_LBL_ROW, endIndex: G1_LBL_ROW+1 }, properties: { pixelSize: 18 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G1_BOX_R1, endIndex: G1_BOX_R2 }, properties: { pixelSize: 24 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G1_CONN_ROW, endIndex: G1_CONN_ROW+1 }, properties: { pixelSize: 8 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G0_LBL_ROW, endIndex: G0_LBL_ROW+1 }, properties: { pixelSize: 18 }, fields: 'pixelSize' }});
+  reqs.push({ updateDimensionProperties: { range: { sheetId: SID, dimension: 'ROWS', startIndex: G0_BOX_R1, endIndex: G0_BOX_R2 }, properties: { pixelSize: 40 }, fields: 'pixelSize' }});
+
+  // ── Title ────────────────────────────────────────────────────────────────────
+  reqs.push({ mergeCells: { range: gridRange(SID,TITLE_ROW,TITLE_ROW+1,0,NCOLS), mergeType:'MERGE_ALL' }});
   reqs.push({ repeatCell: {
-    range: gridRange(SID,0,1,0,TCOL),
+    range: gridRange(SID,TITLE_ROW,TITLE_ROW+1,0,NCOLS),
     cell: { userEnteredFormat: {
       backgroundColor: hex(C.primaryDeep),
-      textFormat: { foregroundColor: hex(C.white), fontSize: 14, bold: true },
+      textFormat: { foregroundColor: hex(C.white), fontSize: 16, bold: true },
       horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
     }},
     fields: 'userEnteredFormat',
   }});
-  vals.push({ range: `'${S}'!A1`, values: [["HARTWELL – O'BRIEN COMPLETE FAMILY TREE  •  All 103 Members Across 10 Generations"]] });
+  vals.push({ range:`'${S}'!A1`, values:[["HARTWELL – O'BRIEN FAMILY PEDIGREE CHART  •  Five Generations  •  Root Person: Emma Rose Hartwell"]] });
 
-  // Row 2: legend
-  reqs.push({ mergeCells: { range: gridRange(SID,1,2,0,TCOL), mergeType:'MERGE_ALL' }});
+  // ── Whole sheet background ────────────────────────────────────────────────────
   reqs.push({ repeatCell: {
-    range: gridRange(SID,1,2,0,TCOL),
-    cell: { userEnteredFormat: {
-      backgroundColor: hex(C.bg),
-      textFormat: { foregroundColor: hex(C.secText), fontSize: 9 },
-      horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
-    }},
-    fields: 'userEnteredFormat',
+    range: gridRange(SID,1,G0_BOX_R2,0,NCOLS),
+    cell: { userEnteredFormat: { backgroundColor: hex(C.bg) } },
+    fields: 'userEnteredFormat.backgroundColor',
   }});
-  vals.push({ range: `'${S}'!A2`, values: [['■ HARTWELL BRANCH (blue)     ■ O\'BRIEN BRANCH (green)     ★ = Root Person     Oldest ancestors at top → Youngest at bottom']] });
 
-  let curRow = 2;
-
-  for (const sec of SECTIONS) {
-    const { title, sub, hBg, hFg, people } = sec;
-
-    // Section header
-    reqs.push({ mergeCells: { range: gridRange(SID, curRow, curRow+1, 0, TCOL), mergeType:'MERGE_ALL' }});
+  // ── Generation label helper ───────────────────────────────────────────────────
+  function genLabel(rowIdx, text, bg, fg) {
+    reqs.push({ mergeCells: { range: gridRange(SID,rowIdx,rowIdx+1,0,NCOLS), mergeType:'MERGE_ALL' }});
     reqs.push({ repeatCell: {
-      range: gridRange(SID, curRow, curRow+1, 0, TCOL),
+      range: gridRange(SID,rowIdx,rowIdx+1,0,NCOLS),
       cell: { userEnteredFormat: {
-        backgroundColor: hex(hBg),
-        textFormat: { foregroundColor: hex(hFg), fontSize: 10, bold: true },
-        horizontalAlignment: 'LEFT', verticalAlignment: 'MIDDLE',
+        backgroundColor: hex(bg),
+        textFormat: { foregroundColor: hex(fg), fontSize: 9, bold: true },
+        horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
       }},
       fields: 'userEnteredFormat',
     }});
-    vals.push({ range: `'${S}'!A${curRow+1}`, values: [[`  ${title}  —  ${sub}  (${people.length} people)`]] });
-    reqs.push({ updateDimensionProperties: {
-      range: { sheetId: SID, dimension: 'ROWS', startIndex: curRow, endIndex: curRow+1 },
-      properties: { pixelSize: 24 }, fields: 'pixelSize',
-    }});
-    curRow++;
-
-    // Person boxes
-    let pos = 0;
-    let boxStartRow = curRow;
-
-    for (const [pid, name, born, died, branch] of people) {
-      const col = pos * BCOL;
-      const r1 = boxStartRow + Math.floor(pos / BPR) * BROW;
-      const r2 = r1 + BROW;
-      const c1 = (pos % BPR) * BCOL;
-      const c2 = c1 + BCOL;
-
-      reqs.push({ mergeCells: { range: gridRange(SID,r1,r2,c1,c2), mergeType:'MERGE_ALL' }});
-
-      const bg = BRANCH_BG[branch] || C.neutral;
-      const fg = BRANCH_FG[branch] || C.text;
-      const isRoot = pid === 'P-00001';
-
-      reqs.push({ repeatCell: {
-        range: gridRange(SID,r1,r2,c1,c2),
-        cell: { userEnteredFormat: {
-          backgroundColor: hex(bg),
-          textFormat: { foregroundColor: hex(fg), fontSize: 9, bold: isRoot },
-          horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE', wrapStrategy: 'WRAP',
-        }},
-        fields: 'userEnteredFormat',
-      }});
-
-      const border = { style: 'SOLID_MEDIUM', color: hex(C.bg) };
-      reqs.push({ updateBorders: {
-        range: gridRange(SID,r1,r2,c1,c2),
-        top: border, bottom: border, left: border, right: border,
-      }});
-
-      vals.push({ range: `'${S}'!${colL(c1)}${r1+1}`, values: [[`${name}\n${born}\n${died}  •  ${pid}`]] });
-      pos++;
-    }
-
-    const rowsUsed = Math.ceil(people.length / BPR) * BROW;
-    // Set row heights for box rows
-    reqs.push({ updateDimensionProperties: {
-      range: { sheetId: SID, dimension: 'ROWS', startIndex: boxStartRow, endIndex: boxStartRow + rowsUsed },
-      properties: { pixelSize: 28 }, fields: 'pixelSize',
-    }});
-
-    curRow = boxStartRow + rowsUsed;
+    vals.push({ range:`'${S}'!A${rowIdx+1}`, values:[[text]] });
   }
 
-  // Title row height
-  reqs.push({ updateDimensionProperties: {
-    range: { sheetId: SID, dimension: 'ROWS', startIndex: 0, endIndex: 1 },
-    properties: { pixelSize: 40 }, fields: 'pixelSize',
-  }});
-  reqs.push({ updateDimensionProperties: {
-    range: { sheetId: SID, dimension: 'ROWS', startIndex: 1, endIndex: 2 },
-    properties: { pixelSize: 18 }, fields: 'pixelSize',
-  }});
+  genLabel(G4_LBL_ROW, '2× GREAT-GRANDPARENTS  (Generation IV)', LBL_BG[0], C.white);
+  genLabel(G3_LBL_ROW, 'GREAT-GRANDPARENTS  (Generation III)',   LBL_BG[1], C.white);
+  genLabel(G2_LBL_ROW, 'GRANDPARENTS  (Generation II)',          LBL_BG[2], C.white);
+  genLabel(G1_LBL_ROW, 'PARENTS  (Generation I)',                LBL_BG[3], C.text);
+  genLabel(G0_LBL_ROW, 'ROOT PERSON  (Generation 0)',            LBL_BG[4], C.white);
+
+  // ── Box helper ────────────────────────────────────────────────────────────────
+  const BOX_BORDER = (bg) => ({ style: 'SOLID', color: hex(C.bg) });
+
+  function personBox(r1, r2, c1, c2, bg, fg, fontSize, bold, content) {
+    reqs.push({ mergeCells: { range: gridRange(SID,r1,r2,c1,c2), mergeType:'MERGE_ALL' }});
+    reqs.push({ repeatCell: {
+      range: gridRange(SID,r1,r2,c1,c2),
+      cell: { userEnteredFormat: {
+        backgroundColor: hex(bg),
+        textFormat: { foregroundColor: hex(fg), fontSize, bold },
+        horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
+        wrapStrategy: 'WRAP',
+      }},
+      fields: 'userEnteredFormat',
+    }});
+    const sep = { style: 'SOLID_MEDIUM', color: hex(C.bg) };
+    reqs.push({ updateBorders: {
+      range: gridRange(SID,r1,r2,c1,c2),
+      top: sep, bottom: sep, left: sep, right: sep,
+    }});
+    vals.push({ range:`'${S}'!${colL(c1)}${r1+1}`, values:[[content]] });
+  }
+
+  // ── GEN4: 16 boxes × 2 cols each ─────────────────────────────────────────────
+  GEN4.forEach((p, i) => {
+    const c1 = i * 2;
+    const isUnk = !p.pid;
+    const bg = isUnk ? C.neutral : BOX_BG[0];
+    const content = `${p.name}\n${p.born}\n${p.died}${p.pid ? '\n'+p.pid : ''}`;
+    personBox(G4_BOX_R1, G4_BOX_R2, c1, c1+2, bg, isUnk ? C.secText : BOX_FG[0], 7, !isUnk, content);
+  });
+
+  // ── GEN3: 8 boxes × 4 cols each ──────────────────────────────────────────────
+  GEN3.forEach((p, i) => {
+    const c1 = i * 4;
+    const content = `${p.name}\n${p.born}\n${p.died}\n${p.pid}`;
+    personBox(G3_BOX_R1, G3_BOX_R2, c1, c1+4, BOX_BG[1], BOX_FG[1], 8, true, content);
+  });
+
+  // ── GEN2: 4 boxes × 8 cols each ──────────────────────────────────────────────
+  GEN2.forEach((p, i) => {
+    const c1 = i * 8;
+    const content = `${p.name}\n${p.born}\n${p.died}\n${p.pid}`;
+    personBox(G2_BOX_R1, G2_BOX_R2, c1, c1+8, BOX_BG[2], BOX_FG[2], 9, true, content);
+  });
+
+  // ── GEN1: 2 boxes × 16 cols each ─────────────────────────────────────────────
+  GEN1.forEach((p, i) => {
+    const c1 = i * 16;
+    const content = `${p.name}\n${p.born}\n${p.marr}\n${p.died}\n${p.occ}`;
+    personBox(G1_BOX_R1, G1_BOX_R2, c1, c1+16, BOX_BG[3], BOX_FG[3], 10, true, content);
+  });
+
+  // ── GEN0: Emma — full width ───────────────────────────────────────────────────
+  const g0content = [
+    GEN0.line1, GEN0.line2, GEN0.line3, GEN0.line4, GEN0.line5
+  ].join('\n');
+  personBox(G0_BOX_R1, G0_BOX_R2, 0, NCOLS, BOX_BG[4], BOX_FG[4], 13, true, g0content);
+
+  // ── Connector rows ────────────────────────────────────────────────────────────
+  // Gen4→Gen3: 8 groups of 4 cols, center cells = [4k+1, 4k+2]
+  const g4g3centers = Array.from({length:8}, (_,k) => [4*k+1, 4*k+2]);
+  reqs.push(...connectorCells(G4_CONN_ROW, g4g3centers));
+
+  // Gen3→Gen2: 4 groups of 8 cols, center cells = [8k+3, 8k+4]
+  const g3g2centers = Array.from({length:4}, (_,k) => [8*k+3, 8*k+4]);
+  reqs.push(...connectorCells(G3_CONN_ROW, g3g2centers));
+
+  // Gen2→Gen1: 2 groups of 16 cols, center cells = [16k+7, 16k+8]
+  const g2g1centers = Array.from({length:2}, (_,k) => [16*k+7, 16*k+8]);
+  reqs.push(...connectorCells(G2_CONN_ROW, g2g1centers));
+
+  // Gen1→Gen0: center cells = [15, 16]
+  reqs.push(...connectorCells(G1_CONN_ROW, [[15,16]]));
 
   await batchUpdate(id, reqs, 'tree-fmt');
   await valuesBatchUpdate(id, vals, 'tree-vals');
-
-  const total = SECTIONS.reduce((s, sec) => s + sec.people.length, 0);
-  console.log(`✓ Family Tree — complete register, ${total} people across ${SECTIONS.length} sections`);
+  console.log(`✓ Family Tree — top-to-bottom pedigree, 5 generations, 31 ancestor positions`);
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
