@@ -60,14 +60,14 @@ function weekTotal(col, criteria) {
     'TASKS DUE THIS WEEK','','COMPLETED','','OVERDUE','','URGENT','','EST. HOURS','','COMPLETION %',''
   ]] });
   // Cards formulas
-  const weekDue     = weekTotal('', '*(${ML}!$K$6:$K$505<>"Cancelled")');
+  const weekDue     = weekTotal('', `*(${ML}!$K$6:$K$505<>"Cancelled")`);
   const weekComp    = weekTotal('', `*(${ML}!$K$6:$K$505="Completed")`);
   const weekOverdue = `IFERROR(SUMPRODUCT((${ML}!$I$6:$I$505>=${wkStart})*(${ML}!$I$6:$I$505<=${wkStart}+6)*(IF(${mbr}="All Team Members",1,${ML}!$F$6:$F$505=${mbr}))*(IF(${proj}="All Projects",1,${ML}!$D$6:$D$505=${proj}))*(IF(${dept}="All Departments",1,${ML}!$E$6:$E$505=${dept}))*(${ML}!$S$6:$S$505="Yes")),0)`;
   const weekUrgent  = weekTotal('', `*(${ML}!$L$6:$L$505="Urgent")`);
   const weekHours   = `IFERROR(SUMPRODUCT((${ML}!$I$6:$I$505>=${wkStart})*(${ML}!$I$6:$I$505<=${wkStart}+6)*(IF(${mbr}="All Team Members",1,${ML}!$F$6:$F$505=${mbr}))*(IF(${proj}="All Projects",1,${ML}!$D$6:$D$505=${proj}))*(IF(${dept}="All Departments",1,${ML}!$E$6:$E$505=${dept}))*(${ML}!$N$6:$N$505)),0)`;
-  const weekPct     = `IFERROR(${weekComp}/${weekTotal('','*(${ML}!$K$6:$K$505<>"Cancelled")')},0)`;
+  const weekPct     = `IFERROR(${weekComp}/${weekDue},0)`;
 
-  data.push({ range:`${S}!A8`, values:[[`=${weekTotal('','*(${ML}!$K$6:$K$505<>"Cancelled")')}`]] });
+  data.push({ range:`${S}!A8`, values:[[`=${weekDue}`]] });
   data.push({ range:`${S}!C8`, values:[[`=${weekTotal('',`*(${ML}!$K$6:$K$505="Completed")`)}`]] });
   data.push({ range:`${S}!E8`, values:[[`=${weekOverdue}`]] });
   data.push({ range:`${S}!G8`, values:[[`=${weekUrgent}`]] });
@@ -139,9 +139,10 @@ function weekTotal(col, criteria) {
   const numF   = { type:'NUMBER', pattern:'0' };
   const pctF   = { type:'PERCENT', pattern:'0%' };
 
-  // Title
-  reqs.push({ mergeCells:{ range:gridRange(WC,0,2,0,12), mergeType:'MERGE_ALL' } });
-  fmt(0,2,0,12,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:18, fontFamily:'Arial' }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
+  // Title — unmerge old 2-row merge before applying 1-row merge
+  reqs.push({ unmergeCells:{ range:gridRange(WC,0,2,0,12) } });
+  reqs.push({ mergeCells:{ range:gridRange(WC,0,1,0,12), mergeType:'MERGE_ALL' } });
+  fmt(0,1,0,12,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:18, fontFamily:'Arial' }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
   fmt(1,6,0,1,{ userEnteredFormat:{ backgroundColor:hex(C.bg), textFormat:{ bold:true, fontSize:9, fontFamily:'Arial' } } });
   fmt(1,6,1,2,{ userEnteredFormat:{ backgroundColor:hex(C.input), textFormat:{ fontSize:10, fontFamily:'Arial' } } });
   reqs.push({ repeatCell:{ range:gridRange(WC,1,2,1,2), cell:{ userEnteredFormat:{ numberFormat:dateF } }, fields:'userEnteredFormat.numberFormat' } });

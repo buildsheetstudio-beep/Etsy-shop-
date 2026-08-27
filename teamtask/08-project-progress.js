@@ -82,32 +82,32 @@ function projectIdFormula(r) {
 // Columns: A=Rank, B=Task ID, C=Task Name, D=Assigned To, E=Priority, F=Due Date,
 // G=Est Hrs, H=Status, I=Overdue?
 
-function selectedOwner() { return `=IFERROR(INDEX($C$9:$C$18,MATCH($B$22,$B$9:$B$18,0)),"—")`; }
-function selectedDept() { return `=IFERROR(INDEX($D$9:$D$18,MATCH($B$22,$B$9:$B$18,0)),"—")`; }
-function selectedStart() { return `=IFERROR(INDEX($E$9:$E$18,MATCH($B$22,$B$9:$B$18,0)),"—")`; }
-function selectedEnd() { return `=IFERROR(INDEX($F$9:$F$18,MATCH($B$22,$B$9:$B$18,0)),"—")`; }
-function selectedStatus() { return `=IFERROR(INDEX($G$9:$G$18,MATCH($B$22,$B$9:$B$18,0)),"—")`; }
-function selectedPriority() { return `=IFERROR(INDEX($H$9:$H$18,MATCH($B$22,$B$9:$B$18,0)),"—")`; }
-function selectedTotalTasks() { return `=IFERROR(INDEX($I$9:$I$18,MATCH($B$22,$B$9:$B$18,0)),0)`; }
-function selectedCompleted() { return `=IFERROR(INDEX($J$9:$J$18,MATCH($B$22,$B$9:$B$18,0)),0)`; }
-function selectedInProgress() { return `=IFERROR(INDEX($K$9:$K$18,MATCH($B$22,$B$9:$B$18,0)),0)`; }
-function selectedOverdue() { return `=IFERROR(INDEX($L$9:$L$18,MATCH($B$22,$B$9:$B$18,0)),0)`; }
-function selectedPct() { return `=IFERROR(INDEX($M$9:$M$18,MATCH($B$22,$B$9:$B$18,0)),0)`; }
-function selectedEstHrs() { return `=IFERROR(INDEX($N$9:$N$18,MATCH($B$22,$B$9:$B$18,0)),0)`; }
-function selectedHrsLogged() { return `=IFERROR(INDEX($O$9:$O$18,MATCH($B$22,$B$9:$B$18,0)),0)`; }
-function selectedHealth() { return `=IFERROR(INDEX($P$9:$P$18,MATCH($B$22,$B$9:$B$18,0)),"—")`; }
-function selectedDaysRem() { return `=IFERROR(INDEX($Q$9:$Q$18,MATCH($B$22,$B$9:$B$18,0)),"—")`; }
-function selectedCancelled() { return `=IFERROR(COUNTIFS('Master Task Log'!$D$6:$D$505,$B$22,'Master Task Log'!$K$6:$K$505,"Cancelled"),0)`; }
+function selectedOwner() { return `=IFERROR(INDEX($C$9:$C$18,MATCH($B$21,$B$9:$B$18,0)),"—")`; }
+function selectedDept() { return `=IFERROR(INDEX($D$9:$D$18,MATCH($B$21,$B$9:$B$18,0)),"—")`; }
+function selectedStart() { return `=IFERROR(INDEX($E$9:$E$18,MATCH($B$21,$B$9:$B$18,0)),"—")`; }
+function selectedEnd() { return `=IFERROR(INDEX($F$9:$F$18,MATCH($B$21,$B$9:$B$18,0)),"—")`; }
+function selectedStatus() { return `=IFERROR(INDEX($G$9:$G$18,MATCH($B$21,$B$9:$B$18,0)),"—")`; }
+function selectedPriority() { return `=IFERROR(INDEX($H$9:$H$18,MATCH($B$21,$B$9:$B$18,0)),"—")`; }
+function selectedTotalTasks() { return `=IFERROR(INDEX($I$9:$I$18,MATCH($B$21,$B$9:$B$18,0)),0)`; }
+function selectedCompleted() { return `=IFERROR(INDEX($J$9:$J$18,MATCH($B$21,$B$9:$B$18,0)),0)`; }
+function selectedInProgress() { return `=IFERROR(INDEX($K$9:$K$18,MATCH($B$21,$B$9:$B$18,0)),0)`; }
+function selectedOverdue() { return `=IFERROR(INDEX($L$9:$L$18,MATCH($B$21,$B$9:$B$18,0)),0)`; }
+function selectedPct() { return `=IFERROR(INDEX($M$9:$M$18,MATCH($B$21,$B$9:$B$18,0)),0)`; }
+function selectedEstHrs() { return `=IFERROR(INDEX($N$9:$N$18,MATCH($B$21,$B$9:$B$18,0)),0)`; }
+function selectedHrsLogged() { return `=IFERROR(INDEX($O$9:$O$18,MATCH($B$21,$B$9:$B$18,0)),0)`; }
+function selectedHealth() { return `=IFERROR(INDEX($P$9:$P$18,MATCH($B$21,$B$9:$B$18,0)),"—")`; }
+function selectedDaysRem() { return `=IFERROR(INDEX($Q$9:$Q$18,MATCH($B$21,$B$9:$B$18,0)),"—")`; }
+function selectedCancelled() { return `=IFERROR(COUNTIFS('Master Task Log'!$D$6:$D$505,$B$21,'Master Task Log'!$K$6:$K$505,"Cancelled"),0)`; }
 
 // Task detail table for selected project
-function detailRankFormula(r) { return `=IFERROR(IF($B$22="","",${r-29}),"")` ; }
+function detailRankFormula(r) { return `=IFERROR(IF($B$21="","",${r-29}),"")` ; }
 function detailTaskId(r) {
-  return `=IFERROR(IF($B$22="","",INDEX('Master Task Log'!$A$6:$A$505,MATCH(SMALL(IF('Master Task Log'!$D$6:$D$505=$B$22,ROW('Master Task Log'!$A$6:$A$505)-5,9999),ROW()-29),'Master Task Log'!$A$6:$A$505,0))),"")`;
+  return `=IFERROR(IF($B$21="","",INDEX('Master Task Log'!$A$6:$A$505,MATCH(SMALL(IF('Master Task Log'!$D$6:$D$505=$B$21,ROW('Master Task Log'!$A$6:$A$505)-5,9999),ROW()-29),'Master Task Log'!$A$6:$A$505,0))),"")`;
 }
 // Non-array SMALL/INDEX/MATCH pattern:
 function detailField(r, col) {
   // SMALL of row numbers where project matches; then INDEX that col
-  return `=IFERROR(IF($B$22="","",INDEX('Master Task Log'!$${col}$6:$${col}$505,SMALL(IF('Master Task Log'!$D$6:$D$505=$B$22,ROW('Master Task Log'!$D$6:$D$505)-5),${r-29}))),"")`;
+  return `=IFERROR(IF($B$21="","",INDEX('Master Task Log'!$${col}$6:$${col}$505,SMALL(IF('Master Task Log'!$D$6:$D$505=$B$21,ROW('Master Task Log'!$D$6:$D$505)-5),${r-29}))),"")`;
 }
 
 (async () => {

@@ -109,9 +109,10 @@ function taskNameOnDate(dateExpr, n) {
   const dateF  = { type:'DATE', pattern:'MMM D, YYYY' };
   const pctF   = { type:'PERCENT', pattern:'0%' };
 
-  // Title
-  reqs.push({ mergeCells:{ range:gridRange(MC,0,2,0,12), mergeType:'MERGE_ALL' } });
-  fmt(0,2,0,12,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:18, fontFamily:'Arial' }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
+  // Title — unmerge old 2-row merge before applying 1-row merge
+  reqs.push({ unmergeCells:{ range:gridRange(MC,0,2,0,12) } });
+  reqs.push({ mergeCells:{ range:gridRange(MC,0,1,0,12), mergeType:'MERGE_ALL' } });
+  fmt(0,1,0,12,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:18, fontFamily:'Arial' }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
   fmt(1,6,0,1,{ userEnteredFormat:{ backgroundColor:hex(C.bg), textFormat:{ bold:true, fontSize:9, fontFamily:'Arial' } } });
   fmt(1,6,1,2,{ userEnteredFormat:{ backgroundColor:hex(C.input), textFormat:{ fontSize:10, fontFamily:'Arial' } } });
 

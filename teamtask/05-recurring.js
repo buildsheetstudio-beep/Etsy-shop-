@@ -82,8 +82,9 @@ function instructionsFormula(r) {
   fmt(0,2,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:18, fontFamily:'Arial' }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
   reqs.push({ mergeCells:{ range:gridRange(RP,2,3,0,17), mergeType:'MERGE_ALL' } });
   fmt(2,3,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.bg), textFormat:{ foregroundColor:hex(C.secText), fontSize:9, fontFamily:'Arial', italic:true }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
-  reqs.push({ mergeCells:{ range:gridRange(RP,3,5,0,17), mergeType:'MERGE_ALL' } });
-  fmt(3,5,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.warning), textFormat:{ foregroundColor:hex(C.mainText), bold:true, fontSize:9, fontFamily:'Arial', italic:true }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE', wrapStrategy:'WRAP' } });
+  reqs.push({ unmergeCells:{ range:gridRange(RP,3,5,0,17) } });
+  reqs.push({ mergeCells:{ range:gridRange(RP,3,4,0,17), mergeType:'MERGE_ALL' } });
+  fmt(3,4,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.warning), textFormat:{ foregroundColor:hex(C.mainText), bold:true, fontSize:9, fontFamily:'Arial', italic:true }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE', wrapStrategy:'WRAP' } });
 
   // Headers row 5
   fmt(4,5,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:9, fontFamily:'Arial' }, horizontalAlignment:'CENTER', verticalAlignment:'MIDDLE' } });

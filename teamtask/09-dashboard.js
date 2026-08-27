@@ -26,28 +26,28 @@ const S = "'Team Dashboard'";
 
 function kpiTotalTasks() {
   return `=IFERROR(SUMPRODUCT(
-(YEAR('Master Task Log'!$J$6:$J$505)=$B$2)*
-IF($B$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$B$4)*
-IF($B$5="All Departments",1,'Master Task Log'!$E$6:$E$505=$B$5)*
-IF($B$6="All Projects",1,'Master Task Log'!$D$6:$D$505=$B$6)*
+(YEAR('Master Task Log'!$J$6:$J$505)=$B$4)*
+IF($F$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$F$4)*
+IF($H$4="All Departments",1,'Master Task Log'!$E$6:$E$505=$H$4)*
+IF($J$4="All Projects",1,'Master Task Log'!$D$6:$D$505=$J$4)*
 ('Master Task Log'!$A$6:$A$505<>"")),0)`.replace(/\n/g,'');
 }
 
 function kpiCompleted() {
   return `=IFERROR(SUMPRODUCT(
-(YEAR('Master Task Log'!$J$6:$J$505)=$B$2)*
-IF($B$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$B$4)*
-IF($B$5="All Departments",1,'Master Task Log'!$E$6:$E$505=$B$5)*
-IF($B$6="All Projects",1,'Master Task Log'!$D$6:$D$505=$B$6)*
+(YEAR('Master Task Log'!$J$6:$J$505)=$B$4)*
+IF($F$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$F$4)*
+IF($H$4="All Departments",1,'Master Task Log'!$E$6:$E$505=$H$4)*
+IF($J$4="All Projects",1,'Master Task Log'!$D$6:$D$505=$J$4)*
 ('Master Task Log'!$K$6:$K$505="Completed")),0)`.replace(/\n/g,'');
 }
 
 function kpiInProgress() {
   return `=IFERROR(SUMPRODUCT(
-(YEAR('Master Task Log'!$J$6:$J$505)=$B$2)*
-IF($B$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$B$4)*
-IF($B$5="All Departments",1,'Master Task Log'!$E$6:$E$505=$B$5)*
-IF($B$6="All Projects",1,'Master Task Log'!$D$6:$D$505=$B$6)*
+(YEAR('Master Task Log'!$J$6:$J$505)=$B$4)*
+IF($F$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$F$4)*
+IF($H$4="All Departments",1,'Master Task Log'!$E$6:$E$505=$H$4)*
+IF($J$4="All Projects",1,'Master Task Log'!$D$6:$D$505=$J$4)*
 ('Master Task Log'!$K$6:$K$505="In Progress")),0)`.replace(/\n/g,'');
 }
 
@@ -55,50 +55,50 @@ function kpiOverdue() {
   return `=IFERROR(SUMPRODUCT(
 ('Master Task Log'!$J$6:$J$505<>"")*
 ('Master Task Log'!$J$6:$J$505<TODAY())*
-IF($B$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$B$4)*
-IF($B$5="All Departments",1,'Master Task Log'!$E$6:$E$505=$B$5)*
-IF($B$6="All Projects",1,'Master Task Log'!$D$6:$D$505=$B$6)*
+IF($F$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$F$4)*
+IF($H$4="All Departments",1,'Master Task Log'!$E$6:$E$505=$H$4)*
+IF($J$4="All Projects",1,'Master Task Log'!$D$6:$D$505=$J$4)*
 ('Master Task Log'!$K$6:$K$505<>"Completed")*
 ('Master Task Log'!$K$6:$K$505<>"Cancelled")),0)`.replace(/\n/g,'');
 }
 
 function kpiUrgent() {
   return `=IFERROR(SUMPRODUCT(
-IF($B$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$B$4)*
-IF($B$5="All Departments",1,'Master Task Log'!$E$6:$E$505=$B$5)*
-IF($B$6="All Projects",1,'Master Task Log'!$D$6:$D$505=$B$6)*
+IF($F$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$F$4)*
+IF($H$4="All Departments",1,'Master Task Log'!$E$6:$E$505=$H$4)*
+IF($J$4="All Projects",1,'Master Task Log'!$D$6:$D$505=$J$4)*
 ('Master Task Log'!$G$6:$G$505="Urgent")*
 ('Master Task Log'!$K$6:$K$505<>"Completed")*
 ('Master Task Log'!$K$6:$K$505<>"Cancelled")),0)`.replace(/\n/g,'');
 }
 
 function kpiCompletionRate() {
-  return `=IFERROR(IF(${kpiTotalTasks()}=0,0,${kpiCompleted()}/${kpiTotalTasks()}),0)`;
+  return `=IFERROR(IF(A8=0,0,C8/A8),0)`;
 }
 
 function kpiBlocked() {
   return `=IFERROR(SUMPRODUCT(
-IF($B$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$B$4)*
-IF($B$5="All Departments",1,'Master Task Log'!$E$6:$E$505=$B$5)*
-IF($B$6="All Projects",1,'Master Task Log'!$D$6:$D$505=$B$6)*
+IF($F$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$F$4)*
+IF($H$4="All Departments",1,'Master Task Log'!$E$6:$E$505=$H$4)*
+IF($J$4="All Projects",1,'Master Task Log'!$D$6:$D$505=$J$4)*
 ('Master Task Log'!$K$6:$K$505="Blocked")),0)`.replace(/\n/g,'');
 }
 
 function kpiEstHours() {
   return `=IFERROR(SUMPRODUCT(
-(YEAR('Master Task Log'!$J$6:$J$505)=$B$2)*
-IF($B$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$B$4)*
-IF($B$5="All Departments",1,'Master Task Log'!$E$6:$E$505=$B$5)*
-IF($B$6="All Projects",1,'Master Task Log'!$D$6:$D$505=$B$6)*
+(YEAR('Master Task Log'!$J$6:$J$505)=$B$4)*
+IF($F$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$F$4)*
+IF($H$4="All Departments",1,'Master Task Log'!$E$6:$E$505=$H$4)*
+IF($J$4="All Projects",1,'Master Task Log'!$D$6:$D$505=$J$4)*
 ('Master Task Log'!$N$6:$N$505)),0)`.replace(/\n/g,'');
 }
 
 function kpiHrsLogged() {
   return `=IFERROR(SUMPRODUCT(
-(YEAR('Master Task Log'!$J$6:$J$505)=$B$2)*
-IF($B$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$B$4)*
-IF($B$5="All Departments",1,'Master Task Log'!$E$6:$E$505=$B$5)*
-IF($B$6="All Projects",1,'Master Task Log'!$D$6:$D$505=$B$6)*
+(YEAR('Master Task Log'!$J$6:$J$505)=$B$4)*
+IF($F$4="All Team Members",1,'Master Task Log'!$F$6:$F$505=$F$4)*
+IF($H$4="All Departments",1,'Master Task Log'!$E$6:$E$505=$H$4)*
+IF($J$4="All Projects",1,'Master Task Log'!$D$6:$D$505=$J$4)*
 ('Master Task Log'!$O$6:$O$505)),0)`.replace(/\n/g,'');
 }
 
@@ -164,6 +164,23 @@ function snapHealth(totalCell, completedCell, overdueCell, projRow) {
 function snapPct(totalCell, completedCell) { return `=IFERROR(IF(${totalCell}=0,0,${completedCell}/${totalCell}),0)`; }
 
 (async () => {
+  // Pre-pass: read existing merges for this sheet and unmerge any in the top 6 rows
+  const { google: goog } = require('googleapis');
+  const fs2 = require('fs');
+  const s2 = JSON.parse(fs2.readFileSync(__dirname + '/client_secret.json'));
+  const auth2 = new goog.auth.OAuth2(s2.installed.client_id, s2.installed.client_secret, s2.installed.redirect_uris[0]);
+  auth2.setCredentials(JSON.parse(fs2.readFileSync(__dirname + '/tokens.json')));
+  const sheets2 = goog.sheets({ version: 'v4', auth: auth2 });
+  const spreadsheetInfo = await sheets2.spreadsheets.get({ spreadsheetId:id, fields:'sheets(properties.sheetId,merges)' });
+  const dbSheet = (spreadsheetInfo.data.sheets || []).find(s => s.properties && s.properties.sheetId === DB);
+  const existingMerges = (dbSheet && dbSheet.merges) ? dbSheet.merges.filter(m => m.startRowIndex < 6) : [];
+  if (existingMerges.length > 0) {
+    await sheets2.spreadsheets.batchUpdate({
+      spreadsheetId:id,
+      requestBody:{ requests: existingMerges.map(range => ({ unmergeCells:{ range } })) }
+    });
+  }
+
   const data = [];
 
   // Title
@@ -208,7 +225,7 @@ function snapPct(totalCell, completedCell) { return `=IFERROR(IF(${totalCell}=0,
     ['Hours Logged',kpiHrsLogged()],
     ['Active Projects',kpiActiveProjects()],
     ['Active Members',kpiActiveMembers()],
-    ['Avg Tasks/Member',`=IFERROR(IF(${kpiActiveMembers()}=0,0,${kpiTotalTasks()}/${kpiActiveMembers()}),0)`],
+    ['Avg Tasks/Member',`=IFERROR(IF(I11=0,0,A8/I11),0)`],
   ];
   kpiSecondary.forEach(([label, formula], i) => {
     const col = String.fromCharCode(65 + i*2);
@@ -299,13 +316,13 @@ function snapPct(totalCell, completedCell) { return `=IFERROR(IF(${totalCell}=0,
   const dateF  = { type:'DATE', pattern:'MMM D, YYYY' };
   const pctF   = { type:'PERCENT', pattern:'0%' };
 
-  // Title rows 0-1
-  reqs.push({ mergeCells:{ range:gridRange(DB,0,2,0,12), mergeType:'MERGE_ALL' } });
-  fmt(0,2,0,12,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:22, fontFamily:'Arial' }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
+  // Title row 0
+  reqs.push({ mergeCells:{ range:gridRange(DB,0,1,0,12), mergeType:'MERGE_ALL' } });
+  fmt(0,1,0,12,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:22, fontFamily:'Arial' }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
 
-  // Subtitle rows 2-3
-  reqs.push({ mergeCells:{ range:gridRange(DB,2,4,0,12), mergeType:'MERGE_ALL' } });
-  fmt(2,4,0,12,{ userEnteredFormat:{ backgroundColor:hex(C.bg), textFormat:{ foregroundColor:hex(C.secText), fontSize:9, fontFamily:'Arial', italic:true }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
+  // Subtitle row 1
+  reqs.push({ mergeCells:{ range:gridRange(DB,1,2,0,12), mergeType:'MERGE_ALL' } });
+  fmt(1,2,0,12,{ userEnteredFormat:{ backgroundColor:hex(C.bg), textFormat:{ foregroundColor:hex(C.secText), fontSize:9, fontFamily:'Arial', italic:true }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
 
   // Controls row 3 (index 3)
   // 5 label+value pairs across A-J
