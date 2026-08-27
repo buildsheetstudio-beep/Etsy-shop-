@@ -44,8 +44,8 @@ function taskNameOnDate(dateExpr, n) {
   const data = [];
 
   data.push({ range:`${S}!A1`, values:[['MONTHLY CALENDAR']] });
-  data.push({ range:`${S}!A2:B2`, values:[['Month:', 'July']] });
-  data.push({ range:`${S}!A3:B3`, values:[['Year:', 2026]] });
+  data.push({ range:`${S}!A2:B2`, values:[['Month:', '=TEXT(TODAY(),"MMMM")']] });
+  data.push({ range:`${S}!A3:B3`, values:[['Year:', '=YEAR(TODAY())']] });
   data.push({ range:`${S}!A4:B4`, values:[['Team Member:', 'All Team Members']] });
   data.push({ range:`${S}!A5:B5`, values:[['Project:', 'All Projects']] });
 

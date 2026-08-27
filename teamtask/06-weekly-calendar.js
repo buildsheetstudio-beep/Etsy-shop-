@@ -50,7 +50,7 @@ function weekTotal(col, criteria) {
 
   // Title
   data.push({ range:`${S}!A1`, values:[['WEEKLY CALENDAR']] });
-  data.push({ range:`${S}!A2:B2`, values:[['Week Start Date:', '2026-07-27']] });
+  data.push({ range:`${S}!A2:B2`, values:[['Week Start Date:', '=TODAY()-MOD(WEEKDAY(TODAY(),2)-1,7)']] });
   data.push({ range:`${S}!A3:B3`, values:[['Team Member:', 'All Team Members']] });
   data.push({ range:`${S}!A4:B4`, values:[['Project:', 'All Projects']] });
   data.push({ range:`${S}!A5:B5`, values:[['Department:', 'All Departments']] });

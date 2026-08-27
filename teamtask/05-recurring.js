@@ -1,5 +1,6 @@
 'use strict';
 const { batchUpdate, valuesBatchUpdate, gridRange, hex, C } = require('./lib');
+const { google } = require('googleapis');
 const fs = require('fs');
 const { id, sheetMap } = JSON.parse(fs.readFileSync(__dirname + '/spreadsheet.json'));
 const RP = sheetMap['Recurring Task Planner'];
@@ -40,6 +41,22 @@ function instructionsFormula(r) {
 }
 
 (async () => {
+  // Dynamic pre-pass: unmerge any existing merges in the first 6 rows so re-runs are safe
+  const auth2 = (() => {
+    const s = JSON.parse(fs.readFileSync(__dirname + '/client_secret.json'));
+    const { client_id, client_secret, redirect_uris } = s.installed;
+    const a = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+    a.setCredentials(JSON.parse(fs.readFileSync(__dirname + '/tokens.json')));
+    return a;
+  })();
+  const sheets2 = google.sheets({ version: 'v4', auth: auth2 });
+  const spInfo = await sheets2.spreadsheets.get({ spreadsheetId:id, fields:'sheets(properties.sheetId,merges)' });
+  const rpSheet = (spInfo.data.sheets || []).find(sh => sh.properties && sh.properties.sheetId === RP);
+  const existingMerges = (rpSheet && rpSheet.merges) ? rpSheet.merges.filter(m => m.startRowIndex < 6) : [];
+  if (existingMerges.length > 0) {
+    await sheets2.spreadsheets.batchUpdate({ spreadsheetId:id, requestBody:{ requests: existingMerges.map(range => ({ unmergeCells:{ range } })) } });
+  }
+
   const data = [];
 
   data.push({ range:`${S}!A1`, values:[['RECURRING TASK PLANNER']] });
@@ -77,14 +94,17 @@ function instructionsFormula(r) {
   const thin   = { style:'SOLID', color:hex(C.border) };
   const dateF  = { type:'DATE', pattern:'MMM D, YYYY' };
 
-  // Title
-  reqs.push({ mergeCells:{ range:gridRange(RP,0,2,0,17), mergeType:'MERGE_ALL' } });
-  fmt(0,2,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:18, fontFamily:'Arial' }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
+  // Title (row 0 = A1 only)
+  reqs.push({ mergeCells:{ range:gridRange(RP,0,1,0,17), mergeType:'MERGE_ALL' } });
+  fmt(0,1,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:18, fontFamily:'Arial' }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
+  // Description (row 1 = A2)
+  reqs.push({ mergeCells:{ range:gridRange(RP,1,2,0,17), mergeType:'MERGE_ALL' } });
+  fmt(1,2,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.bg), textFormat:{ foregroundColor:hex(C.secText), fontSize:9, fontFamily:'Arial', italic:true }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
+  // Warning note (row 2 = A3)
   reqs.push({ mergeCells:{ range:gridRange(RP,2,3,0,17), mergeType:'MERGE_ALL' } });
-  fmt(2,3,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.bg), textFormat:{ foregroundColor:hex(C.secText), fontSize:9, fontFamily:'Arial', italic:true }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE' } });
-  reqs.push({ unmergeCells:{ range:gridRange(RP,3,5,0,17) } });
-  reqs.push({ mergeCells:{ range:gridRange(RP,3,4,0,17), mergeType:'MERGE_ALL' } });
-  fmt(3,4,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.warning), textFormat:{ foregroundColor:hex(C.mainText), bold:true, fontSize:9, fontFamily:'Arial', italic:true }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE', wrapStrategy:'WRAP' } });
+  fmt(2,3,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.warning), textFormat:{ foregroundColor:hex(C.mainText), bold:true, fontSize:9, fontFamily:'Arial', italic:true }, horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE', wrapStrategy:'WRAP' } });
+  // Spacer row (row 3 = A4)
+  fmt(3,4,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.bg) } });
 
   // Headers row 5
   fmt(4,5,0,17,{ userEnteredFormat:{ backgroundColor:hex(C.primary), textFormat:{ foregroundColor:hex(C.white), bold:true, fontSize:9, fontFamily:'Arial' }, horizontalAlignment:'CENTER', verticalAlignment:'MIDDLE' } });
@@ -119,8 +139,8 @@ function instructionsFormula(r) {
   [[0,90],[1,200],[2,140],[3,120],[4,120],[5,80],[6,80],[7,120],[8,100],[9,110],[10,100],[11,80],[12,70],[13,100],[14,100],[15,260],[16,180]].forEach(([ci,w]) => {
     reqs.push({ updateDimensionProperties:{ range:{ sheetId:RP, dimension:'COLUMNS', startIndex:ci, endIndex:ci+1 }, properties:{ pixelSize:w }, fields:'pixelSize' } });
   });
-  reqs.push({ updateDimensionProperties:{ range:{ sheetId:RP, dimension:'ROWS', startIndex:0, endIndex:2 }, properties:{ pixelSize:36 }, fields:'pixelSize' } });
-  reqs.push({ updateDimensionProperties:{ range:{ sheetId:RP, dimension:'ROWS', startIndex:2, endIndex:5 }, properties:{ pixelSize:24 }, fields:'pixelSize' } });
+  reqs.push({ updateDimensionProperties:{ range:{ sheetId:RP, dimension:'ROWS', startIndex:0, endIndex:1 }, properties:{ pixelSize:36 }, fields:'pixelSize' } });
+  reqs.push({ updateDimensionProperties:{ range:{ sheetId:RP, dimension:'ROWS', startIndex:1, endIndex:5 }, properties:{ pixelSize:24 }, fields:'pixelSize' } });
   reqs.push({ updateDimensionProperties:{ range:{ sheetId:RP, dimension:'ROWS', startIndex:5, endIndex:30 }, properties:{ pixelSize:22 }, fields:'pixelSize' } });
 
   reqs.push({ updateSheetProperties:{ properties:{ sheetId:RP, gridProperties:{ frozenRowCount:5 } }, fields:'gridProperties.frozenRowCount' } });
