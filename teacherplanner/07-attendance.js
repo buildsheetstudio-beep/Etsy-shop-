@@ -1,5 +1,5 @@
 'use strict';
-const { batchUpdate, valuesBatchUpdate, gridRange, hex, C } = require('./lib');
+const { sheets, batchUpdate, valuesBatchUpdate, gridRange, hex, C } = require('./lib');
 const fs = require('fs');
 const { id, sheetMap } = JSON.parse(fs.readFileSync(__dirname + '/spreadsheet.json'));
 const SID = sheetMap['Attendance'];
@@ -145,6 +145,14 @@ addRecords(ATT_DAYS_CLS002, 'CLS-002', CLASS_STUDENTS['CLS-002'], 1);
 console.log(`Generating ${RECORDS.length} attendance records...`);
 
 (async () => {
+  // Dynamic pre-pass: unmerge existing merges in first 5 rows to prevent re-run errors
+  const spInfo = await sheets.spreadsheets.get({ spreadsheetId: id, fields: 'sheets(properties.sheetId,merges)' });
+  const thisSheet = (spInfo.data.sheets || []).find(sh => sh.properties && sh.properties.sheetId === SID);
+  const existingMerges = (thisSheet && thisSheet.merges) ? thisSheet.merges.filter(m => m.startRowIndex < 5) : [];
+  if (existingMerges.length > 0) {
+    await sheets.spreadsheets.batchUpdate({ spreadsheetId: id, requestBody: { requests: existingMerges.map(range => ({ unmergeCells: { range } })) } });
+  }
+
   const vals = [];
   const fmt  = [];
 
@@ -160,16 +168,29 @@ console.log(`Generating ${RECORDS.length} attendance records...`);
   }}, fields:'userEnteredFormat' }});
   fmt.push({ updateDimensionProperties:{ range:{sheetId:SID,dimension:'ROWS',startIndex:0,endIndex:1}, properties:{pixelSize:44}, fields:'pixelSize' }});
 
-  // Subtitle row 2
-  vals.push({ range:`${S}!A2`, values:[['Log daily attendance here. Student Name auto-populates from Student ID. Class Name auto-populates from Class ID.']] });
-  fmt.push({ mergeCells:{ range: gridRange(SID,1,2,0,16), mergeType:'MERGE_ALL' }});
-  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,0,16), cell:{userEnteredFormat:{
-    backgroundColor:hex('#4A5056'), textFormat:{fontSize:9,foregroundColor:hex('#D5D8DB'),italic:true,fontFamily:'Arial'},
-    horizontalAlignment:'CENTER', verticalAlignment:'MIDDLE',
+  // Filter controls row 2: Month (B2)
+  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,0,1), cell:{userEnteredFormat:{
+    backgroundColor:hex(C.altRow), textFormat:{bold:true,fontSize:9,foregroundColor:hex(C.text),fontFamily:'Arial'},
+    horizontalAlignment:'RIGHT', verticalAlignment:'MIDDLE',
   }}, fields:'userEnteredFormat' }});
+  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,1,2), cell:{userEnteredFormat:{
+    backgroundColor:hex(C.input), textFormat:{fontSize:9,foregroundColor:hex(C.text),fontFamily:'Arial'},
+    horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE',
+  }}, fields:'userEnteredFormat' }});
+  fmt.push({ setDataValidation:{ range: gridRange(SID,1,2,1,2), rule:{
+    condition:{ type:'ONE_OF_LIST', values:[
+      {userEnteredValue:'All'},
+      {userEnteredValue:'September 2025'},
+      {userEnteredValue:'October 2025'},
+    ]},
+    showCustomUi:true, strict:false,
+  }}});
+  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,2,16), cell:{userEnteredFormat:{
+    backgroundColor:hex(C.bg),
+  }}, fields:'userEnteredFormat.backgroundColor' }});
 
   // Alert row 3
-  vals.push({ range:`${S}!A3`, values:[['Absent rows highlighted red. Tardy rows highlighted amber. Filter by Date or Class ID to view a single day or class.']] });
+  vals.push({ range:`${S}!A3`, values:[['Use the Month filter (B2) above to view attendance by month. Absent rows are red; Tardy rows are amber.']] });
   fmt.push({ mergeCells:{ range: gridRange(SID,2,3,0,16), mergeType:'MERGE_ALL' }});
   fmt.push({ repeatCell:{ range: gridRange(SID,2,3,0,16), cell:{userEnteredFormat:{
     backgroundColor:hex(C.Science), textFormat:{fontSize:9,foregroundColor:hex(C.text),fontFamily:'Arial'},
@@ -201,6 +222,11 @@ console.log(`Generating ${RECORDS.length} attendance records...`);
   });
 
   await batchUpdate(id, fmt, '07-attendance format');
+  // Write filter control labels and defaults to row 2
+  await valuesBatchUpdate(id, [
+    { range:`${S}!A2`, values:[['Month:']] },
+    { range:`${S}!B2`, values:[['All']] },
+  ], '07-attendance filter controls');
 
   // Formula columns for 1500 rows: A (Record ID), E (Class Name), G (Student Name)
   const ROWS = 1500;
@@ -281,6 +307,14 @@ console.log(`Generating ${RECORDS.length} attendance records...`);
   fmtData.push({ repeatCell:{ range: gridRange(SID,5,5005,10,14), cell:{userEnteredFormat:{
     horizontalAlignment:'CENTER',
   }}, fields:'userEnteredFormat.horizontalAlignment' }});
+
+  // Gray out rows not matching the selected month (highest priority — index 0)
+  fmtData.push({ addConditionalFormatRule:{ rule:{
+    ranges:[gridRange(SID,5,5005,0,16)],
+    booleanRule:{ condition:{type:'CUSTOM_FORMULA', values:[{userEnteredValue:'=AND($D6<>"",$B$2<>"All",TEXT($B6,"MMMM YYYY")<>$B$2)'}]},
+      format:{ textFormat:{ foregroundColor:hex('#CCCCCC') }, backgroundColor:hex('#EDEDED') },
+    },
+  }, index:0}});
 
   await batchUpdate(id, fmtData, '07-attendance data format');
   console.log(`✅ Attendance done. ${RECORDS.length} records.`);

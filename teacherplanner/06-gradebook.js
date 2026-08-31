@@ -1,5 +1,5 @@
 'use strict';
-const { batchUpdate, valuesBatchUpdate, gridRange, hex, C } = require('./lib');
+const { sheets, batchUpdate, valuesBatchUpdate, gridRange, hex, C } = require('./lib');
 const fs = require('fs');
 const { id, sheetMap } = JSON.parse(fs.readFileSync(__dirname + '/spreadsheet.json'));
 const SID = sheetMap['Gradebook'];
@@ -122,6 +122,14 @@ GRADED.forEach(([asnId, clsId, maxPts, dateGraded, missRate], ai) => {
 console.log(`Generating ${GRADES.length} grade records...`);
 
 (async () => {
+  // Dynamic pre-pass: unmerge existing merges in first 5 rows to prevent re-run errors
+  const spInfo = await sheets.spreadsheets.get({ spreadsheetId: id, fields: 'sheets(properties.sheetId,merges)' });
+  const thisSheet = (spInfo.data.sheets || []).find(sh => sh.properties && sh.properties.sheetId === SID);
+  const existingMerges = (thisSheet && thisSheet.merges) ? thisSheet.merges.filter(m => m.startRowIndex < 5) : [];
+  if (existingMerges.length > 0) {
+    await sheets.spreadsheets.batchUpdate({ spreadsheetId: id, requestBody: { requests: existingMerges.map(range => ({ unmergeCells: { range } })) } });
+  }
+
   const vals = [];
   const fmt  = [];
 
@@ -137,16 +145,47 @@ console.log(`Generating ${GRADES.length} grade records...`);
   }}, fields:'userEnteredFormat' }});
   fmt.push({ updateDimensionProperties:{ range:{sheetId:SID,dimension:'ROWS',startIndex:0,endIndex:1}, properties:{pixelSize:44}, fields:'pixelSize' }});
 
-  // Subtitle row 2
-  vals.push({ range:`${S}!A2`, values:[['Enter scores in the Score column. Percentage auto-calculates. Check Missing for unsubmitted work; Graded when scored.']] });
-  fmt.push({ mergeCells:{ range: gridRange(SID,1,2,0,20), mergeType:'MERGE_ALL' }});
-  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,0,20), cell:{userEnteredFormat:{
-    backgroundColor:hex('#4A5056'), textFormat:{fontSize:9,foregroundColor:hex('#D5D8DB'),italic:true,fontFamily:'Arial'},
-    horizontalAlignment:'CENTER', verticalAlignment:'MIDDLE',
+  // Filter controls row 2: Grading Period (B2) and Subject/Class (D2)
+  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,0,1), cell:{userEnteredFormat:{
+    backgroundColor:hex(C.altRow), textFormat:{bold:true,fontSize:9,foregroundColor:hex(C.text),fontFamily:'Arial'},
+    horizontalAlignment:'RIGHT', verticalAlignment:'MIDDLE',
   }}, fields:'userEnteredFormat' }});
+  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,1,2), cell:{userEnteredFormat:{
+    backgroundColor:hex(C.input), textFormat:{fontSize:9,foregroundColor:hex(C.text),fontFamily:'Arial'},
+    horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE',
+  }}, fields:'userEnteredFormat' }});
+  fmt.push({ setDataValidation:{ range: gridRange(SID,1,2,1,2), rule:{
+    condition:{ type:'ONE_OF_LIST', values:[
+      {userEnteredValue:'All'},{userEnteredValue:'Q1 (Sep-Nov 2025)'},
+      {userEnteredValue:'Q2 (Dec-Feb 2026)'},{userEnteredValue:'Q3 (Mar-May 2026)'},
+    ]},
+    showCustomUi:true, strict:false,
+  }}});
+  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,2,3), cell:{userEnteredFormat:{
+    backgroundColor:hex(C.altRow), textFormat:{bold:true,fontSize:9,foregroundColor:hex(C.text),fontFamily:'Arial'},
+    horizontalAlignment:'RIGHT', verticalAlignment:'MIDDLE',
+  }}, fields:'userEnteredFormat' }});
+  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,3,4), cell:{userEnteredFormat:{
+    backgroundColor:hex(C.input), textFormat:{fontSize:9,foregroundColor:hex(C.text),fontFamily:'Arial'},
+    horizontalAlignment:'LEFT', verticalAlignment:'MIDDLE',
+  }}, fields:'userEnteredFormat' }});
+  fmt.push({ setDataValidation:{ range: gridRange(SID,1,2,3,4), rule:{
+    condition:{ type:'ONE_OF_LIST', values:[
+      {userEnteredValue:'All Classes'},
+      {userEnteredValue:'ELA – Grade 4'},
+      {userEnteredValue:'Reading – Grade 4'},
+      {userEnteredValue:'Math – Grade 4'},
+      {userEnteredValue:'Science – Grade 4'},
+      {userEnteredValue:'Social Studies G4'},
+    ]},
+    showCustomUi:true, strict:false,
+  }}});
+  fmt.push({ repeatCell:{ range: gridRange(SID,1,2,4,20), cell:{userEnteredFormat:{
+    backgroundColor:hex(C.bg),
+  }}, fields:'userEnteredFormat.backgroundColor' }});
 
   // Info row 3
-  vals.push({ range:`${S}!A3`, values:[['Filter by Class ID or Student ID. Missing rows highlighted red. Late submissions highlighted amber. Grade summary on Dashboard tab.']] });
+  vals.push({ range:`${S}!A3`, values:[['Use Grading Period (B2) and Subject/Class (D2) filters above. Missing rows are red; late submissions are amber. Totals on Dashboard.']] });
   fmt.push({ mergeCells:{ range: gridRange(SID,2,3,0,20), mergeType:'MERGE_ALL' }});
   fmt.push({ repeatCell:{ range: gridRange(SID,2,3,0,20), cell:{userEnteredFormat:{
     backgroundColor:hex(C.Math), textFormat:{fontSize:9,foregroundColor:hex(C.text),fontFamily:'Arial'},
@@ -179,6 +218,13 @@ console.log(`Generating ${GRADES.length} grade records...`);
   });
 
   await batchUpdate(id, fmt, '06-gradebook format');
+  // Write filter control labels and defaults to row 2
+  await valuesBatchUpdate(id, [
+    { range:`${S}!A2`, values:[['Grading Period:']] },
+    { range:`${S}!B2`, values:[['All']] },
+    { range:`${S}!C2`, values:[['Subject / Class:']] },
+    { range:`${S}!D2`, values:[['All Classes']] },
+  ], '06-gradebook filter controls');
 
   // Formula columns (all 1500 rows) — build as column arrays
   const ROWS = 1500;
@@ -283,6 +329,16 @@ console.log(`Generating ${GRADES.length} grade records...`);
   fmtData.push({ repeatCell:{ range: gridRange(SID,5,5005,8,11), cell:{userEnteredFormat:{
     horizontalAlignment:'CENTER',
   }}, fields:'userEnteredFormat.horizontalAlignment' }});
+
+  // Gray out rows not matching the active filters (highest priority — index 0)
+  const periodFilt = `OR($B$2="All",$S6="",AND($B$2="Q1 (Sep-Nov 2025)",$S6>=DATE(2025,9,1),$S6<=DATE(2025,11,30)),AND($B$2="Q2 (Dec-Feb 2026)",$S6>=DATE(2025,12,1),$S6<=DATE(2026,2,28)),AND($B$2="Q3 (Mar-May 2026)",$S6>=DATE(2026,3,1),$S6<=DATE(2026,5,31)))`;
+  const subjectFilt = `OR($D$2="All Classes",$E6=$D$2)`;
+  fmtData.push({ addConditionalFormatRule:{ rule:{
+    ranges:[gridRange(SID,5,5005,0,20)],
+    booleanRule:{ condition:{type:'CUSTOM_FORMULA', values:[{userEnteredValue:`=AND($B6<>"",NOT(AND(${periodFilt},${subjectFilt})))`}]},
+      format:{ textFormat:{ foregroundColor:hex('#CCCCCC') }, backgroundColor:hex('#EDEDED') },
+    },
+  }, index:0}});
 
   await batchUpdate(id, fmtData, '06-gradebook data format');
   console.log(`✅ Gradebook done. ${GRADES.length} grade records.`);
