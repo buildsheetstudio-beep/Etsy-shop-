@@ -202,5 +202,13 @@ const STATE_BENEFITS = [
 
   await valuesBatchUpdate(id, vals, '02-reference values');
   await batchUpdate(id, fmt, '02-reference format');
+
+  // Hide Reference Data sheet now that other sheets exist
+  await batchUpdate(id, [{
+    updateSheetProperties: {
+      properties: { sheetId: SID, hidden: true },
+      fields: 'hidden'
+    }
+  }], '02-reference hide');
   console.log('✅  Reference Data done.');
 })().catch(e => { console.error(e.errors || e.message || e); process.exit(1); });

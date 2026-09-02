@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const TABS = [
-  { title: 'Reference Data',          sheetId: 0, rows: 300,  cols: 18, hidden: true  },
+  { title: 'Reference Data',          sheetId: 0, rows: 300,  cols: 18, hidden: false },
   { title: 'Beneficiary Setup',        sheetId: 1, rows: 600,  cols: 18, hidden: false },
   { title: 'College Cost Estimator',   sheetId: 2, rows: 200,  cols: 24, hidden: false },
   { title: '529 Accounts',             sheetId: 3, rows: 1100, cols: 26, hidden: false },

@@ -40,7 +40,7 @@ const sourceRange = (sheetId, r1, r2, c1, c2) => ({
             legendPosition: 'BOTTOM_LEGEND',
             axis: [
               { position: 'BOTTOM_AXIS', title: 'Month' },
-              { position: 'LEFT_AXIS', title: 'Portfolio Value ($)', format: { pattern: '"$"#,##0' } }
+              { position: 'LEFT_AXIS', title: 'Portfolio Value ($)' }
             ],
             domains: [{
               domain: {
@@ -99,7 +99,7 @@ const sourceRange = (sheetId, r1, r2, c1, c2) => ({
             chartType: 'BAR',
             legendPosition: 'BOTTOM_LEGEND',
             axis: [
-              { position: 'BOTTOM_AXIS', title: 'Amount ($)', format: { pattern: '"$"#,##0' } },
+              { position: 'BOTTOM_AXIS', title: 'Amount ($)' },
               { position: 'LEFT_AXIS', title: 'Beneficiary' }
             ],
             domains: [{
