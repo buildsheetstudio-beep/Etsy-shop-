@@ -1,0 +1,8 @@
+{
+  "name": "workoutplanner3",
+  "version": "1.0.0",
+  "main": "01-create.js",
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  }
+}
