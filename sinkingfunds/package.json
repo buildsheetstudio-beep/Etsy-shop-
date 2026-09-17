@@ -1,0 +1,9 @@
+{
+  "name": "sinking-funds-tracker",
+  "version": "1.0.0",
+  "description": "Build scripts for Ultimate Sinking Funds Tracker Google Sheet",
+  "private": true,
+  "dependencies": {
+    "googleapis": "^105.0.0"
+  }
+}
