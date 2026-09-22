@@ -1,0 +1,9 @@
+{
+  "name": "medtracker",
+  "version": "1.0.0",
+  "description": "Ultimate Medical Expense Tracker — Google Sheets builder",
+  "main": "01-create.js",
+  "scripts": { "test": "echo \"Error: no test specified\" && exit 1" },
+  "keywords": [], "author": "", "license": "ISC",
+  "dependencies": { "googleapis": "^173.0.0" }
+}
