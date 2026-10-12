@@ -78,7 +78,7 @@ const YEAR_RE    = /[^A-Z](202[0-9]|20[3-9][0-9])/;  // hardcoded year literals 
   const allHardYear    = [];
   const allGsFns       = {};
   const allNewFns      = {};
-  const allArrayForm   = [];
+  const allArrayFormula = [];
 
   for (const sp of tabList) {
     const tab    = sp.title;
