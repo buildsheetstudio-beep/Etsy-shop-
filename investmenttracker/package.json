@@ -1,0 +1,10 @@
+{
+  "name": "investmenttracker",
+  "version": "1.0.0",
+  "description": "Ultimate Investment Tracker – Google Sheets build scripts",
+  "main": "index.js",
+  "scripts": {},
+  "dependencies": {
+    "googleapis": "^105.0.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "ultimate-recipe-organizer",
+  "version": "1.0.0",
+  "description": "Build scripts for Ultimate Recipe Organizer Google Sheet",
+  "private": true,
+  "dependencies": {
+    "googleapis": "^105.0.0"
+  }
+}
